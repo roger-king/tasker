@@ -19,22 +19,22 @@ type Task struct {
 }
 
 // New -
-func New() *Cronus {
+func New() *Tasker {
 	m, err := pkg.NewMongoConnection()
 
 	if err != nil {
 		log.Panic(err)
 	}
 
-	return &Cronus{
+	return &Tasker{
 		MongoConnection: m,
 	}
 }
 
 // Start -
-func (c *Cronus) Start() {
+func (c *Tasker) Start() {
 	defer c.MongoConnection.DB.Close()
-	log.Println("Starting cronus")
+	log.Println("Starting tasker")
 	http.HandleFunc("/", HelloServer)
 	http.ListenAndServe(":8080", nil)
 }
