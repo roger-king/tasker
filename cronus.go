@@ -3,6 +3,7 @@ package cronus
 import (
 	"fmt"
 	"log"
+	"net/http"
 
 	"github.com/roger-king/cronus/pkg"
 )
@@ -10,6 +11,11 @@ import (
 // Cronus -
 type Cronus struct {
 	MongoConnection *pkg.MongoConnection
+}
+
+// Task - object
+type Task struct {
+	Name string `bson:"name"`
 }
 
 // New -
@@ -27,5 +33,12 @@ func New() *Cronus {
 
 // Start -
 func (c *Cronus) Start() {
-	fmt.Println("Starting Cronus Server.")
+	defer c.MongoConnection.DB.Close()
+	log.Println("Starting cronus")
+	http.HandleFunc("/", HelloServer)
+	http.ListenAndServe(":8080", nil)
+}
+
+func HelloServer(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
 }
