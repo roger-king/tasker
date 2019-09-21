@@ -2,21 +2,30 @@ package cronus
 
 import (
 	"fmt"
+	"log"
+
+	"github.com/roger-king/cronus/pkg"
 )
 
 // Cronus -
 type Cronus struct {
-	Name string
+	MongoConnection *pkg.MongoConnection
 }
 
 // New -
-func New(name string) *Cronus {
+func New() *Cronus {
+	m, err := pkg.NewMongoConnection()
+
+	if err != nil {
+		log.Panic(err)
+	}
+
 	return &Cronus{
-		Name: name,
+		MongoConnection: m,
 	}
 }
 
-// Say -
-func (c *Cronus) Say() {
-	fmt.Println("Hello", c.Name)
+// Start -
+func (c *Cronus) Start() {
+	fmt.Println("Starting Cronus Server.")
 }
