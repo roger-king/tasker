@@ -1,4 +1,4 @@
-module github.com/roger-king/cronus
+module github.com/roger-king/tasker
 
 go 1.13
 

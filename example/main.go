@@ -1,10 +1,8 @@
 package main
 
-import (
-	"github.com/roger-king/cronus"
-)
+import "github.com/roger-king/tasker"
 
 func main() {
-	c := cronus.New()
-	c.Start()
+	t := tasker.New()
+	t.Start()
 }

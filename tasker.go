@@ -1,15 +1,15 @@
-package cronus
+package tasker
 
 import (
 	"fmt"
 	"log"
 	"net/http"
 
-	"github.com/roger-king/cronus/pkg"
+	"github.com/roger-king/tasker/pkg"
 )
 
-// Cronus -
-type Cronus struct {
+// Tasker -
+type Tasker struct {
 	MongoConnection *pkg.MongoConnection
 }
 
