@@ -26,6 +26,11 @@ type NewInputTask struct {
 	Schedule string `json:"schedule"`
 }
 
+// TaskSearchOptions -
+type TaskSearchOptions struct {
+	Enabled bool `json:"enabled"`
+}
+
 // BeforeCreate - hook for creation
 func (t *Task) BeforeCreate() {
 	t.TaskID = uuid.New().String()
@@ -54,6 +59,16 @@ func (t *TaskService) List() ([]Task, error) {
 	var tasks []Task
 
 	results := t.Collection.Find()
+	err := results.All(&tasks)
+	return tasks, err
+}
+
+// ListEnabledTasks - List all tasks that are enabled
+// TODO: dynamically add the filter
+func (t *TaskService) ListEnabledTasks(opts *TaskSearchOptions) ([]Task, error) {
+	var tasks []Task
+
+	results := t.Collection.Find("enabled", opts.Enabled)
 	err := results.All(&tasks)
 	return tasks, err
 }
