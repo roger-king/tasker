@@ -15,6 +15,7 @@ type Task struct {
 	Schedule  string    `bson:"schedule"`
 	Enabled   bool      `bson:"enabled"`
 	Complete  bool      `bson:"complete"`
+	Executor  string    `bson:"executor"`
 	CreatedAt time.Time `bson:"createdAt"`
 	UpdatedAt time.Time `bson:"updatedAt"`
 	DeletedAt time.Time `bson:"deletedAt"`
@@ -24,6 +25,7 @@ type Task struct {
 type NewInputTask struct {
 	Name     string `json:"name"`
 	Schedule string `json:"schedule"`
+	Executor string `json:"executor"`
 }
 
 // TaskSearchOptions -
@@ -33,6 +35,12 @@ type TaskSearchOptions struct {
 
 // BeforeCreate - hook for creation
 func (t *Task) BeforeCreate() {
+	// Default executor bash
+	// TODO: configuration options
+	if len(t.Executor) == 0 {
+		t.Executor = "bash"
+	}
+
 	t.TaskID = uuid.New().String()
 	t.Enabled = true
 	t.Complete = false
