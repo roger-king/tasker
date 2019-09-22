@@ -1,21 +1,15 @@
 package tasker
 
 import (
-	"fmt"
 	"log"
-	"net/http"
 
+	"github.com/gorilla/mux"
 	"github.com/roger-king/tasker/pkg"
 )
 
 // Tasker -
 type Tasker struct {
 	MongoConnection *pkg.MongoConnection
-}
-
-// Task - object
-type Task struct {
-	Name string `bson:"name"`
 }
 
 // New -
@@ -31,15 +25,19 @@ func New() *Tasker {
 	}
 }
 
-// Start -
-func (c *Tasker) Start() {
-	defer c.MongoConnection.DB.Close()
+// Start - returns a mux router instance
+func (t *Tasker) Start() *mux.Router {
+	session := t.MongoConnection.DB
 	log.Println("Starting tasker")
-	http.HandleFunc("/", HelloServer)
-	http.ListenAndServe(":8080", nil)
-}
 
-// HelloServer -
-func HelloServer(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
+	// cr := cron.New()
+	// cr.AddFunc(task.Schedule, func() {
+	// 	fmt.Println("test")
+	// })
+
+	// cr.Start()
+
+	r := mux.NewRouter()
+	r.HandleFunc("/api/tasks", pkg.ListTasks(session)).Methods("GET")
+	return r
 }
