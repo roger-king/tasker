@@ -1,6 +1,7 @@
 package pkg
 
 import (
+	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -9,7 +10,7 @@ import (
 
 // Task - Task is the main object describing the collection
 type Task struct {
-	TaskID    uuid.UUID `bson:"taskId"`
+	TaskID    string    `bson:"taskId"`
 	Name      string    `bson:"name"`
 	Schedule  string    `bson:"schedule"`
 	Enabled   bool      `bson:"enabled"`
@@ -27,7 +28,7 @@ type NewInputTask struct {
 
 // BeforeCreate - hook for creation
 func (t *Task) BeforeCreate() {
-	t.TaskID = uuid.New()
+	t.TaskID = uuid.New().String()
 	t.Enabled = true
 	t.Complete = false
 	t.CreatedAt = time.Now()
@@ -68,4 +69,27 @@ func (t *TaskService) Create(newTask *NewInputTask) (interface{}, error) {
 
 	createdTask, err := t.Collection.Insert(task)
 	return createdTask, err
+}
+
+// Disable -
+func (t *TaskService) Disable(taskID string) (bool, error) {
+	var err error
+	var task Task
+
+	res := t.Collection.Find("taskId", taskID)
+	log.Print(res)
+	err = res.One(&task)
+
+	if err != nil {
+		return false, err
+	}
+
+	task.Enabled = false
+	err = res.Update(task)
+
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }

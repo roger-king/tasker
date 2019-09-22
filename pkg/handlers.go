@@ -2,8 +2,10 @@ package pkg
 
 import (
 	"encoding/json"
+	"io"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	db "upper.io/db.v3"
 )
 
@@ -29,24 +31,43 @@ func CreateTask(session db.Database) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var input NewInputTask
 
-		decoder := json.NewDecoder(r.Body)
+		defer session.Close()
 
-		if err := decoder.Decode(&input); err != nil {
-			respondWithError(w, http.StatusBadRequest, "invalid_request", err.Error())
+		_, err := jsonDecode(input, r.Body)
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "request_error", err.Error())
 			return
 		}
-
-		defer session.Close()
 
 		taskService := NewTaskService(session)
 		tasks, err := taskService.Create(&input)
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "", err.Error())
+			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
 			return
 		}
 
 		respondWithJSON(w, http.StatusOK, tasks)
+		return
+	}
+}
+
+// DisableTask -
+func DisableTask(session db.Database) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		defer session.Close()
+
+		taskService := NewTaskService(session)
+		result, err := taskService.Disable(vars["taskID"])
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
+			return
+		}
+
+		respondWithJSON(w, http.StatusOK, result)
 		return
 	}
 }
@@ -75,4 +96,14 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
+}
+
+func jsonDecode(input interface{}, reqBody io.ReadCloser) (*interface{}, error) {
+	decoder := json.NewDecoder(reqBody)
+
+	if err := decoder.Decode(&input); err != nil {
+		return nil, err
+	}
+
+	return &input, nil
 }
