@@ -27,8 +27,9 @@ func New() *Tasker {
 
 // Start - returns a mux router instance
 func (t *Tasker) Start() *mux.Router {
-	session := t.MongoConnection.DB
 	log.Println("Starting tasker")
+
+	session := t.MongoConnection.DB
 
 	// cr := cron.New()
 	// cr.AddFunc(task.Schedule, func() {
@@ -38,6 +39,8 @@ func (t *Tasker) Start() *mux.Router {
 	// cr.Start()
 
 	r := mux.NewRouter()
-	r.HandleFunc("/api/tasks", pkg.ListTasks(session)).Methods("GET")
+	apiRouter := r.PathPrefix("/api").Subrouter()
+	apiRouter.HandleFunc("/tasks", pkg.ListTasks(session)).Methods("GET")
+	apiRouter.HandleFunc("/tasks", pkg.CreateTask(session)).Methods("POST")
 	return r
 }

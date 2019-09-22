@@ -24,6 +24,33 @@ func ListTasks(session db.Database) http.HandlerFunc {
 	}
 }
 
+// CreateTask -
+func CreateTask(session db.Database) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var input NewInputTask
+
+		decoder := json.NewDecoder(r.Body)
+
+		if err := decoder.Decode(&input); err != nil {
+			respondWithError(w, http.StatusBadRequest, "invalid_request", err.Error())
+			return
+		}
+
+		defer session.Close()
+
+		taskService := NewTaskService(session)
+		tasks, err := taskService.Create(&input)
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "", err.Error())
+			return
+		}
+
+		respondWithJSON(w, http.StatusOK, tasks)
+		return
+	}
+}
+
 // Response Helpers:
 type errorHelper struct {
 	Error       string `json:"error"`

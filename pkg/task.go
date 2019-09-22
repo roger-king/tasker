@@ -19,6 +19,12 @@ type Task struct {
 	DeletedAt time.Time `bson:"deletedAt"`
 }
 
+// NewInputTask - object to store all parameters for creating a new task
+type NewInputTask struct {
+	Name     string `json:"name"`
+	Schedule string `json:"schedule"`
+}
+
 // BeforeCreate - hook for creation
 func (t *Task) BeforeCreate() {
 	t.TaskID = uuid.New()
@@ -52,7 +58,12 @@ func (t *TaskService) List() ([]Task, error) {
 }
 
 // Create - create operation for task service
-func (t *TaskService) Create(task *Task) (interface{}, error) {
+func (t *TaskService) Create(newTask *NewInputTask) (interface{}, error) {
+	task := &Task{
+		Name:     newTask.Name,
+		Schedule: newTask.Schedule,
+	}
+
 	task.BeforeCreate()
 
 	createdTask, err := t.Collection.Insert(task)
