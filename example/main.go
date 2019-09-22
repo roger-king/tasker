@@ -1,8 +1,15 @@
 package main
 
-import "github.com/roger-king/tasker"
+import (
+	"net/http"
+
+	"github.com/roger-king/tasker"
+)
 
 func main() {
 	t := tasker.New()
-	t.Start()
+	router := t.Start()
+
+	http.Handle("/", router)
+	http.ListenAndServe(":8080", nil)
 }
