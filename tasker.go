@@ -4,12 +4,14 @@ import (
 	"log"
 
 	"github.com/gorilla/mux"
+	"github.com/robfig/cron"
 	"github.com/roger-king/tasker/pkg"
 )
 
 // Tasker -
 type Tasker struct {
-	MongoConnection *pkg.MongoConnection
+	mongoConnection *pkg.MongoConnection
+	Scheduler       *cron.Cron
 }
 
 // New -
@@ -21,22 +23,16 @@ func New() *Tasker {
 	}
 
 	return &Tasker{
-		MongoConnection: m,
+		mongoConnection: m,
+		Scheduler:       cron.New(),
 	}
 }
 
 // Start - returns a mux router instance
 func (t *Tasker) Start() *mux.Router {
 	log.Println("Starting tasker")
-
-	session := t.MongoConnection.DB
-
-	// cr := cron.New()
-	// cr.AddFunc(task.Schedule, func() {
-	// 	fmt.Println("test")
-	// })
-
-	// cr.Start()
+	t.Scheduler.Start()
+	session := t.mongoConnection.DB
 
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/api").Subrouter()
