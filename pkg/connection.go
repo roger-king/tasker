@@ -3,6 +3,7 @@ package pkg
 import (
 	"log"
 
+	"github.com/go-redis/redis"
 	db "upper.io/db.v3"
 	"upper.io/db.v3/mongo"
 )
@@ -22,13 +23,8 @@ type MongoConnectionURL struct {
 	Options  MongoConnectionOptions
 }
 
-// MongoConnection - object to store connection to mongo db
-type MongoConnection struct {
-	DB db.Database
-}
-
 // NewMongoConnection - creates a MongoConnection instance
-func NewMongoConnection() (*MongoConnection, error) {
+func NewMongoConnection() (db.Database, error) {
 	options := make(map[string]string)
 	options["authSource"] = "admin"
 
@@ -46,7 +42,22 @@ func NewMongoConnection() (*MongoConnection, error) {
 		log.Fatal(err)
 	}
 
-	return &MongoConnection{
-		DB: session,
-	}, nil
+	return session, nil
+}
+
+// NewRedisConnection -
+func NewRedisConnection() (*redis.Client, error) {
+	client := redis.NewClient(&redis.Options{
+		Addr:     "localhost:6379",
+		Password: "", // no password set
+		DB:       0,  // use default DB
+	})
+
+	pong, err := client.Ping().Result()
+
+	if err == nil {
+		log.Print("Connected to Redis.", pong)
+	}
+
+	return client, err
 }

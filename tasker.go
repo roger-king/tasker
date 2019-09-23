@@ -6,11 +6,12 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron"
 	"github.com/roger-king/tasker/pkg"
+	db "upper.io/db.v3"
 )
 
 // Tasker -
 type Tasker struct {
-	mongoConnection *pkg.MongoConnection
+	mongoConnection db.Database
 	Scheduler       *cron.Cron
 }
 
@@ -32,7 +33,7 @@ func New() *Tasker {
 func (t *Tasker) Start() *mux.Router {
 	log.Println("Starting tasker")
 	t.Scheduler.Start()
-	session := t.mongoConnection.DB
+	session := t.mongoConnection
 
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/api").Subrouter()
