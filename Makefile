@@ -3,7 +3,7 @@ DOCKER_TARGET?=ci
 setup:
 	go mod vendor
 
-example:
+app:
 	go run example/main.go
 	
 cleanup:
