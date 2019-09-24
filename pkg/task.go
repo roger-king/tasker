@@ -10,15 +10,16 @@ import (
 
 // Task - Task is the main object describing the collection
 type Task struct {
-	TaskID    string    `bson:"taskId"`
-	Name      string    `bson:"name"`
-	Schedule  string    `bson:"schedule"`
-	Enabled   bool      `bson:"enabled"`
-	Complete  bool      `bson:"complete"`
-	Executor  string    `bson:"executor"`
-	CreatedAt time.Time `bson:"createdAt"`
-	UpdatedAt time.Time `bson:"updatedAt"`
-	DeletedAt time.Time `bson:"deletedAt"`
+	TaskID    string            `bson:"taskId"`
+	Name      string            `bson:"name"`
+	Schedule  string            `bson:"schedule"`
+	Enabled   bool              `bson:"enabled"`
+	Complete  bool              `bson:"complete"`
+	Executor  string            `bson:"executor"`
+	Args      map[string]string `bson:"args"`
+	CreatedAt time.Time         `bson:"createdAt"`
+	UpdatedAt time.Time         `bson:"updatedAt"`
+	DeletedAt time.Time         `bson:"deletedAt"`
 }
 
 // NewInputTask - object to store all parameters for creating a new task
