@@ -35,3 +35,18 @@ Tasker is simple to get started. Tasker has 2 goals at mind:
 ```
 
 Go to your server and find the tasker web client at `/tasker`.
+
+## Configuration of your server
+
+Tasker utilizes [`12 Factor App configs`](https://12factor.net/config). Tasker relies environment variables to handle configruation of the application
+
+Below are the availble of environment variables that Tasker looks for (note: prefixed with `TASKER_`):
+
+| ENV                |                                        Description                                         |
+| ------------------ | :----------------------------------------------------------------------------------------: |
+| TASKER_DB_TYPE     |        type of presistent data store for your scheduled tasks (e.g. redis or mongo)        |
+| TASKER_DB_HOST     |                            host address for your database type                             |
+| TASKER_DB_USER     |                       username used to authenticate against your db                        |
+| TASKER_DB_PASSWORD |                       password used to authenticate against your db                        |
+| TASKER_DB_PORT     | port your database is listening on (if not specified will use the default your desired db) |
+| TASKER_SCRIPT_ROOT |                        root directory where your scripts are stored                        |
