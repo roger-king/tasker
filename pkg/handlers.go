@@ -53,6 +53,25 @@ func CreateTask(session db.Database) http.HandlerFunc {
 	}
 }
 
+// FindOneTask -
+func FindOneTask(session db.Database) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		defer session.Close()
+
+		taskService := NewTaskService(session)
+		task, err := taskService.FindOne(vars["taskID"])
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
+			return
+		}
+
+		respondWithJSON(w, http.StatusOK, task)
+		return
+	}
+}
+
 // DisableTask -
 func DisableTask(session db.Database) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -68,6 +87,25 @@ func DisableTask(session db.Database) http.HandlerFunc {
 		}
 
 		respondWithJSON(w, http.StatusOK, result)
+		return
+	}
+}
+
+// DeleteTask -
+func DeleteTask(session db.Database) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		defer session.Close()
+
+		taskService := NewTaskService(session)
+		err := taskService.Delete(vars["taskID"])
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
+			return
+		}
+
+		respondWithJSON(w, http.StatusOK, "done")
 		return
 	}
 }

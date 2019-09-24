@@ -1,7 +1,6 @@
 package pkg
 
 import (
-	"log"
 	"time"
 
 	"github.com/google/uuid"
@@ -95,13 +94,24 @@ func (t *TaskService) Create(newTask *NewInputTask) (interface{}, error) {
 	return createdTask, err
 }
 
+// FindOne -
+func (t *TaskService) FindOne(taskID string) (Task, error) {
+	var err error
+	var task Task
+
+	res := t.Collection.Find("taskId", taskID)
+	err = res.One(&task)
+
+	return task, err
+}
+
 // Disable -
 func (t *TaskService) Disable(taskID string) (bool, error) {
 	var err error
 	var task Task
 
 	res := t.Collection.Find("taskId", taskID)
-	log.Print(res)
+
 	err = res.One(&task)
 
 	if err != nil {
@@ -116,4 +126,14 @@ func (t *TaskService) Disable(taskID string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// Delete -
+func (t *TaskService) Delete(taskID string) error {
+	var err error
+
+	res := t.Collection.Find("taskId", taskID)
+	err = res.Delete()
+
+	return err
 }
