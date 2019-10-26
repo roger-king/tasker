@@ -40,6 +40,7 @@ func (t *Tasker) Start() *mux.Router {
 	apiRouter.HandleFunc("/tasks", pkg.ListTasks(session)).Methods("GET")
 	apiRouter.HandleFunc("/tasks", pkg.CreateTask(session)).Methods("POST")
 
+	// test
 	// Single Task Routes
 	apiRouter.HandleFunc("/tasks/{taskID}", pkg.FindOneTask(session)).Methods("GET")
 	apiRouter.HandleFunc("/tasks/{taskID}/disable", pkg.DisableTask(session)).Methods("PATCH")
