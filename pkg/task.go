@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/robfig/cron"
 	db "upper.io/db.v3"
 )
 
@@ -12,6 +13,7 @@ type Task struct {
 	TaskID    string            `bson:"taskId"`
 	Name      string            `bson:"name"`
 	Schedule  string            `bson:"schedule"`
+	IsSet     bool              `bson:"isSet"`
 	Enabled   bool              `bson:"enabled"`
 	Complete  bool              `bson:"complete"`
 	Executor  string            `bson:"executor"`
@@ -42,6 +44,7 @@ func (t *Task) BeforeCreate() {
 	}
 
 	t.TaskID = uuid.New().String()
+	t.IsSet = true
 	t.Enabled = true
 	t.Complete = false
 	t.CreatedAt = time.Now()
@@ -82,7 +85,7 @@ func (t *TaskService) ListEnabledTasks(opts *TaskSearchOptions) ([]Task, error) 
 }
 
 // Create - create operation for task service
-func (t *TaskService) Create(newTask *NewInputTask) (interface{}, error) {
+func (t *TaskService) Create(newTask *NewInputTask, scheduler *cron.Cron) (interface{}, error) {
 	task := &Task{
 		Name:     newTask.Name,
 		Schedule: newTask.Schedule,
