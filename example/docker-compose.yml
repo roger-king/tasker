@@ -19,3 +19,10 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: appuser
       ME_CONFIG_MONGODB_ADMINPASSWORD: appuser
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - 6379:6379
+    
