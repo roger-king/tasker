@@ -38,7 +38,7 @@ func (t *Tasker) Start() *mux.Router {
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/api").Subrouter()
 	apiRouter.HandleFunc("/tasks", pkg.ListTasks(session)).Methods("GET")
-	apiRouter.HandleFunc("/tasks", pkg.CreateTask(session)).Methods("POST")
+	apiRouter.HandleFunc("/tasks", pkg.CreateTask(session, t.Scheduler)).Methods("POST")
 
 	// test
 	// Single Task Routes

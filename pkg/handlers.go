@@ -4,8 +4,10 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os/exec"
 
 	"github.com/gorilla/mux"
+	"github.com/robfig/cron"
 	db "upper.io/db.v3"
 )
 
@@ -27,7 +29,7 @@ func ListTasks(session db.Database) http.HandlerFunc {
 }
 
 // CreateTask -
-func CreateTask(session db.Database) http.HandlerFunc {
+func CreateTask(session db.Database, scheduler *cron.Cron) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var input NewInputTask
 
@@ -36,15 +38,19 @@ func CreateTask(session db.Database) http.HandlerFunc {
 		_, err := jsonDecode(input, r.Body)
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "request_error", err.Error())
+			respondWithError(w, http.StatusInternalServerError, RequestError, err.Error())
 			return
 		}
+
+		scheduler.AddFunc(input.Schedule, func() {
+			exec.Command(input.Executor)
+		})
 
 		taskService := NewTaskService(session)
 		tasks, err := taskService.Create(&input)
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
 			return
 		}
 
@@ -63,7 +69,7 @@ func FindOneTask(session db.Database) http.HandlerFunc {
 		task, err := taskService.FindOne(vars["taskID"])
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
 			return
 		}
 
@@ -82,7 +88,7 @@ func DisableTask(session db.Database) http.HandlerFunc {
 		result, err := taskService.Disable(vars["taskID"])
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
 			return
 		}
 
@@ -101,7 +107,7 @@ func DeleteTask(session db.Database) http.HandlerFunc {
 		err := taskService.Delete(vars["taskID"])
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "process_error", err.Error())
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
 			return
 		}
 
@@ -120,8 +126,8 @@ type dataHelper struct {
 	Data interface{} `json:"data"`
 }
 
-func respondWithError(w http.ResponseWriter, code int, errorType string, message string) {
-	response, _ := json.Marshal(&errorHelper{Error: errorType, Description: message})
+func respondWithError(w http.ResponseWriter, code int, errorType HTTPError, message string) {
+	response, _ := json.Marshal(&errorHelper{Error: errorType.String(), Description: message})
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
