@@ -3,9 +3,13 @@ package pkg
 // HTTPError -
 type HTTPError string
 
+func (h HTTPError) String() string {
+	return string(h)
+}
+
 const (
 	// ProcessingError -
-	ProcessingError = "processing_error"
+	ProcessingError HTTPError = "processing_error"
 	// RequestError -
-	RequestError = "request_error"
+	RequestError HTTPError = "request_error"
 )
