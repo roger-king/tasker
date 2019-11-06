@@ -1,0 +1,3 @@
+tasker:
+  - name: helloworld
+    fn: HelloWorld
