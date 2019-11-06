@@ -1,24 +1,24 @@
 version: "3.1"
 
 services:
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: appuser
-      MONGO_INITDB_ROOT_PASSWORD: appuser
-      MONGO_INITDB_DATABASE: familia
+  # mongo:
+  #   image: mongo
+  #   restart: always
+  #   ports:
+  #     - 27017:27017
+  #   environment:
+  #     MONGO_INITDB_ROOT_USERNAME: appuser
+  #     MONGO_INITDB_ROOT_PASSWORD: appuser
+  #     MONGO_INITDB_DATABASE: familia
 
-  mongo-express:
-    image: mongo-express
-    restart: always
-    ports:
-      - 8081:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: appuser
-      ME_CONFIG_MONGODB_ADMINPASSWORD: appuser
+  # mongo-express:
+  #   image: mongo-express
+  #   restart: always
+  #   ports:
+  #     - 8081:8081
+  #   environment:
+  #     ME_CONFIG_MONGODB_ADMINUSERNAME: appuser
+  #     ME_CONFIG_MONGODB_ADMINPASSWORD: appuser
 
   redis:
     image: redis
