@@ -8,6 +8,22 @@ import (
 	"upper.io/db.v3/mongo"
 )
 
+type ConnectionType string
+
+const (
+	REDIS ConnectionType = "redis"
+	MONGO ConnectionType = "mongo"
+)
+
+type ConnectionDetails struct {
+	Host     string
+	User     string
+	Password string
+	DB       DBName
+}
+
+type DBName interface{}
+
 // MongoConnectionOptions -
 type MongoConnectionOptions struct {
 	AuthSource string
@@ -46,11 +62,11 @@ func NewMongoConnection() (db.Database, error) {
 }
 
 // NewRedisConnection -
-func NewRedisConnection() (*redis.Client, error) {
+func NewRedisConnection(d *ConnectionDetails) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     d.Host,
+		Password: d.Password, // no password set
+		DB:       d.DB.(int), // use default DB
 	})
 
 	pong, err := client.Ping().Result()

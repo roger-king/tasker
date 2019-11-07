@@ -3,6 +3,7 @@ package tasker
 import (
 	"log"
 
+	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron"
 	"github.com/roger-king/tasker/pkg"
@@ -12,21 +13,44 @@ import (
 // Tasker -
 type Tasker struct {
 	mongoConnection db.Database
+	redisConnection *redis.Client
 	Scheduler       *cron.Cron
 }
 
-// New -
-func New() *Tasker {
-	m, err := pkg.NewMongoConnection()
+type TaskerCongfig struct {
+	ConnectionType pkg.ConnectionType
+	Details        *pkg.ConnectionDetails
+}
 
-	if err != nil {
-		log.Panic(err)
+// New - Creates a new instance of tasker
+func New(tc *TaskerCongfig) *Tasker {
+	t := &Tasker{
+		Scheduler: cron.New(),
 	}
 
-	return &Tasker{
-		mongoConnection: m,
-		Scheduler:       cron.New(),
+	switch tc.ConnectionType {
+	case pkg.MONGO:
+		m, err := pkg.NewMongoConnection()
+
+		if err != nil {
+			log.Panic(err)
+		}
+		t.mongoConnection = m
+		break
+	case pkg.REDIS:
+		r, err := pkg.NewRedisConnection(tc.Details)
+
+		if err != nil {
+			log.Panic(err)
+		}
+		t.redisConnection = r
+		break
+	default:
+		// The default connection type will be redis
+		break
 	}
+
+	return t
 }
 
 // Start - returns a mux router instance

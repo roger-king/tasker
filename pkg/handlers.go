@@ -47,7 +47,7 @@ func CreateTask(session db.Database, scheduler *cron.Cron) http.HandlerFunc {
 		})
 
 		taskService := NewTaskService(session)
-		tasks, err := taskService.Create(&input)
+		tasks, err := taskService.Create(&input, scheduler)
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
@@ -85,14 +85,14 @@ func DisableTask(session db.Database) http.HandlerFunc {
 		defer session.Close()
 
 		taskService := NewTaskService(session)
-		result, err := taskService.Disable(vars["taskID"])
+		err := taskService.Disable(vars["taskID"])
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
 			return
 		}
 
-		respondWithJSON(w, http.StatusOK, result)
+		respondWithJSON(w, http.StatusOK, "")
 		return
 	}
 }
