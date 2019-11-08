@@ -2,21 +2,16 @@ package pkg
 
 import (
 	"encoding/json"
-	"io"
 	"net/http"
 	"os/exec"
 
-	"github.com/gorilla/mux"
 	"github.com/robfig/cron"
-	db "upper.io/db.v3"
 )
 
 // ListTasks -
-func ListTasks(session db.Database) http.HandlerFunc {
+func ListTasks(t *TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		defer session.Close()
-		taskService := NewTaskService(session)
-		tasks, err := taskService.List()
+		tasks, err := t.List()
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "", err.Error())
@@ -29,15 +24,12 @@ func ListTasks(session db.Database) http.HandlerFunc {
 }
 
 // CreateTask -
-func CreateTask(session db.Database, scheduler *cron.Cron) http.HandlerFunc {
+func CreateTask(t *TaskService, scheduler *cron.Cron) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var input NewInputTask
+		decoder := json.NewDecoder(r.Body)
 
-		defer session.Close()
-
-		_, err := jsonDecode(input, r.Body)
-
-		if err != nil {
+		if err := decoder.Decode(&input); err != nil {
 			respondWithError(w, http.StatusInternalServerError, RequestError, err.Error())
 			return
 		}
@@ -46,8 +38,7 @@ func CreateTask(session db.Database, scheduler *cron.Cron) http.HandlerFunc {
 			exec.Command(input.Executor)
 		})
 
-		taskService := NewTaskService(session)
-		tasks, err := taskService.Create(&input, scheduler)
+		tasks, err := t.Create(&input)
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
@@ -59,62 +50,62 @@ func CreateTask(session db.Database, scheduler *cron.Cron) http.HandlerFunc {
 	}
 }
 
-// FindOneTask -
-func FindOneTask(session db.Database) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		defer session.Close()
+// // FindOneTask -
+// func FindOneTask(session db.Database) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		vars := mux.Vars(r)
+// 		defer session.Close()
 
-		taskService := NewTaskService(session)
-		task, err := taskService.FindOne(vars["taskID"])
+// 		taskService := NewTaskService(session)
+// 		task, err := taskService.FindOne(vars["taskID"])
 
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-			return
-		}
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+// 			return
+// 		}
 
-		respondWithJSON(w, http.StatusOK, task)
-		return
-	}
-}
+// 		respondWithJSON(w, http.StatusOK, task)
+// 		return
+// 	}
+// }
 
-// DisableTask -
-func DisableTask(session db.Database) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		defer session.Close()
+// // DisableTask -
+// func DisableTask(session db.Database) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		vars := mux.Vars(r)
+// 		defer session.Close()
 
-		taskService := NewTaskService(session)
-		err := taskService.Disable(vars["taskID"])
+// 		taskService := NewTaskService(session)
+// 		err := taskService.Disable(vars["taskID"])
 
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-			return
-		}
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+// 			return
+// 		}
 
-		respondWithJSON(w, http.StatusOK, "")
-		return
-	}
-}
+// 		respondWithJSON(w, http.StatusOK, "")
+// 		return
+// 	}
+// }
 
-// DeleteTask -
-func DeleteTask(session db.Database) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		defer session.Close()
+// // DeleteTask -
+// func DeleteTask(session db.Database) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		vars := mux.Vars(r)
+// 		defer session.Close()
 
-		taskService := NewTaskService(session)
-		err := taskService.Delete(vars["taskID"])
+// 		taskService := NewTaskService(session)
+// 		err := taskService.Delete(vars["taskID"])
 
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-			return
-		}
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+// 			return
+// 		}
 
-		respondWithJSON(w, http.StatusOK, "done")
-		return
-	}
-}
+// 		respondWithJSON(w, http.StatusOK, "done")
+// 		return
+// 	}
+// }
 
 // Response Helpers:
 type errorHelper struct {
@@ -140,14 +131,4 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)
 	w.Write(response)
-}
-
-func jsonDecode(input interface{}, reqBody io.ReadCloser) (*interface{}, error) {
-	decoder := json.NewDecoder(reqBody)
-
-	if err := decoder.Decode(&input); err != nil {
-		return nil, err
-	}
-
-	return &input, nil
 }

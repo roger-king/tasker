@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	t := tasker.New(&tasker.TaskerCongfig{
+	t := tasker.New(&tasker.TaskerConfig{
 		ConnectionType: "redis",
 		Details: &pkg.ConnectionDetails{
 			Host: "localhost:6379",

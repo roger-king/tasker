@@ -12,14 +12,14 @@ type ConnectionType string
 
 const (
 	REDIS ConnectionType = "redis"
-	MONGO ConnectionType = "mongo"
+	// MONGO ConnectionType = "mongo"
 )
 
 type ConnectionDetails struct {
-	Host     string
-	User     string
-	Password string
-	DB       DBName
+	Host     string `required:"true"`
+	User     string `required:"true"`
+	Password string `required:"true"`
+	DB       DBName `required:"true"`
 }
 
 type DBName interface{}
