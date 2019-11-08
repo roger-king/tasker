@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os/exec"
 
+	"github.com/gorilla/mux"
 	"github.com/robfig/cron"
 )
 
@@ -50,24 +51,21 @@ func CreateTask(t *TaskService, scheduler *cron.Cron) http.HandlerFunc {
 	}
 }
 
-// // FindOneTask -
-// func FindOneTask(session db.Database) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		vars := mux.Vars(r)
-// 		defer session.Close()
+// FindOneTask -
+func FindTask(t *TaskService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		task, err := t.Find(vars["taskID"])
 
-// 		taskService := NewTaskService(session)
-// 		task, err := taskService.FindOne(vars["taskID"])
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			return
+		}
 
-// 		if err != nil {
-// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-// 			return
-// 		}
-
-// 		respondWithJSON(w, http.StatusOK, task)
-// 		return
-// 	}
-// }
+		respondWithJSON(w, http.StatusOK, task)
+		return
+	}
+}
 
 // // DisableTask -
 // func DisableTask(session db.Database) http.HandlerFunc {
@@ -88,24 +86,21 @@ func CreateTask(t *TaskService, scheduler *cron.Cron) http.HandlerFunc {
 // 	}
 // }
 
-// // DeleteTask -
-// func DeleteTask(session db.Database) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		vars := mux.Vars(r)
-// 		defer session.Close()
+// DeleteTask -
+func DeleteTask(t *TaskService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		ok, err := t.Delete(vars["taskID"])
 
-// 		taskService := NewTaskService(session)
-// 		err := taskService.Delete(vars["taskID"])
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			return
+		}
 
-// 		if err != nil {
-// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-// 			return
-// 		}
-
-// 		respondWithJSON(w, http.StatusOK, "done")
-// 		return
-// 	}
-// }
+		respondWithJSON(w, http.StatusOK, ok)
+		return
+	}
+}
 
 // Response Helpers:
 type errorHelper struct {

@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"time"
 
@@ -49,25 +48,32 @@ func (t *TaskService) List() ([]Task, error) {
 			log.Panic(err)
 			return nil, err
 		}
-		fmt.Println(results)
-		// for _, r := range results {
-		// 	var task Task
-		// 	err := json.Unmarshal([]byte(r), &task)
 
-		// 	if err != nil {
-		// 		// log.Error("Failed to marshal data")
-		// 		break
-		// 	}
+		for _, r := range results {
+			var task Task
 
-		// 	tasks = append(tasks, task)
-		// }
+			value, err := t.Client.Get(r).Result()
+
+			if err != nil {
+				// Cannot find values for key
+				return nil, err
+			}
+
+			err = json.Unmarshal([]byte(value), &task)
+
+			if err != nil {
+				// log.Error("Failed to marshal data")
+				return nil, err
+			}
+
+			tasks = append(tasks, task)
+		}
 	}
 
 	return tasks, nil
 }
 
 func (t *TaskService) Create(task *NewInputTask) (*Task, error) {
-	fmt.Println(task.Name)
 	createdTask := &Task{
 		TaskID:    uuid.New().String(),
 		Name:      task.Name,
@@ -93,6 +99,41 @@ func (t *TaskService) Create(task *NewInputTask) (*Task, error) {
 	}
 
 	return createdTask, nil
+}
+
+func (t *TaskService) Find(id string) (*Task, error) {
+	var task Task
+
+	if t.Client != nil {
+		value, err := t.Client.Get(id).Result()
+
+		if err != nil {
+			// Cannot find values for key
+			return nil, err
+		}
+
+		err = json.Unmarshal([]byte(value), &task)
+
+		if err != nil {
+			// log.Error("Failed to marshal data")
+			return nil, err
+		}
+	}
+
+	return &task, nil
+}
+
+func (t *TaskService) Delete(id string) (bool, error) {
+	if t.Client != nil {
+		err := t.Client.Del(id).Err()
+
+		if err != nil {
+			// Cannot find values for key
+			return false, err
+		}
+	}
+
+	return true, nil
 }
 
 // NewInputTask - object to store all parameters for creating a new task
