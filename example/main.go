@@ -9,10 +9,11 @@ import (
 
 func main() {
 	t := tasker.New(&tasker.TaskerConfig{
-		ConnectionType: "redis",
 		Details: &pkg.ConnectionDetails{
-			Host: "localhost:6379",
-			DB:   0,
+			Host:     "localhost:27017",
+			DBName:   "tasker",
+			User:     "appuser",
+			Password: "appuser",
 		},
 	})
 	router := t.Start()

@@ -12,6 +12,8 @@ func ListTasks(t *TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tasks, err := t.List()
 
+		defer t.DB.Close()
+
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "", err.Error())
 			return

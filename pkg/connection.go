@@ -3,26 +3,16 @@ package pkg
 import (
 	"log"
 
-	"github.com/go-redis/redis"
 	db "upper.io/db.v3"
 	"upper.io/db.v3/mongo"
-)
-
-type ConnectionType string
-
-const (
-	REDIS ConnectionType = "redis"
-	// MONGO ConnectionType = "mongo"
 )
 
 type ConnectionDetails struct {
 	Host     string `required:"true"`
 	User     string `required:"true"`
 	Password string `required:"true"`
-	DB       DBName `required:"true"`
+	DBName   string `required:"true"`
 }
-
-type DBName interface{}
 
 // MongoConnectionOptions -
 type MongoConnectionOptions struct {
@@ -59,21 +49,4 @@ func NewMongoConnection() (db.Database, error) {
 	}
 
 	return session, nil
-}
-
-// NewRedisConnection -
-func NewRedisConnection(d *ConnectionDetails) (*redis.Client, error) {
-	client := redis.NewClient(&redis.Options{
-		Addr:     d.Host,
-		Password: d.Password, // no password set
-		DB:       d.DB.(int), // use default DB
-	})
-
-	pong, err := client.Ping().Result()
-
-	if err == nil {
-		log.Print("Connected to Redis.", pong)
-	}
-
-	return client, err
 }
