@@ -2,11 +2,14 @@ package pkg
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
+	"plugin"
 	"time"
 
 	"github.com/go-redis/redis"
 	"github.com/google/uuid"
+	"github.com/robfig/cron"
 	db "upper.io/db.v3"
 )
 
@@ -20,22 +23,28 @@ type ITask interface {
 	Disable(taskId string) error
 }
 
-type Task struct {
-	TaskID    string            `json:"taskId" bson:"taskId"`
-	Name      string            `json:"name" bson:"name"`
-	Schedule  string            `json:"schedule" bson:"schedule"`
-	IsSet     bool              `json:"isSet" bson:"isSet"`
-	Enabled   bool              `json:"enabled" bson:"enabled"`
-	Complete  bool              `json:"complete" bson:"complete"`
-	Args      map[string]string `json:"args" bson:"args"`
-	CreatedAt time.Time         `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time         `json:"updatedAt" bson:"updatedAt"`
-	DeletedAt time.Time         `json:"deletedAt" bson:"deletedAt"`
+type Payload interface {
+	Run(args map[string]interface{}) error
 }
 
+type Task struct {
+	TaskID    string                 `json:"taskId" bson:"taskId"`
+	Name      string                 `json:"name" bson:"name"`
+	Schedule  string                 `json:"schedule" bson:"schedule"`
+	IsSet     bool                   `json:"isSet" bson:"isSet"`
+	Enabled   bool                   `json:"enabled" bson:"enabled"`
+	Complete  bool                   `json:"complete" bson:"complete"`
+	Args      map[string]interface{} `json:"args" bson:"args"`
+	CreatedAt time.Time              `json:"createdAt" bson:"createdAt"`
+	UpdatedAt time.Time              `json:"updatedAt" bson:"updatedAt"`
+	DeletedAt time.Time              `json:"deletedAt" bson:"deletedAt"`
+}
+
+// TaskService - This is a wrapper around Tasker object
 type TaskService struct {
-	Client *redis.Client
-	DB     db.Database
+	Client    *redis.Client
+	DB        db.Database
+	Scheduler *cron.Cron
 }
 
 func (t *TaskService) List() ([]Task, error) {
@@ -84,6 +93,29 @@ func (t *TaskService) Create(task *NewInputTask) (*Task, error) {
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 	}
+
+	t.Scheduler.AddFunc(task.Schedule, func() {
+		plug, err := plugin.Open("./plugins/main.so")
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		run, err := plug.Lookup("Run")
+
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
+		err = run.(func(map[string]interface{}) error)(task.Args)
+
+		if err != nil {
+			fmt.Print(err)
+			return
+		}
+	})
 
 	if t.Client != nil {
 		bt, err := json.Marshal(createdTask)
@@ -138,9 +170,10 @@ func (t *TaskService) Delete(id string) (bool, error) {
 
 // NewInputTask - object to store all parameters for creating a new task
 type NewInputTask struct {
-	Name     string `json:"name"`
-	Schedule string `json:"schedule"`
-	Executor string `json:"executor"`
+	Name     string                 `json:"name"`
+	Args     map[string]interface{} `json:"args"`
+	Schedule string                 `json:"schedule"`
+	Executor string                 `json:"executor"`
 }
 
 // TaskSearchOptions -

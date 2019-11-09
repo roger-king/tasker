@@ -3,10 +3,8 @@ package pkg
 import (
 	"encoding/json"
 	"net/http"
-	"os/exec"
 
 	"github.com/gorilla/mux"
-	"github.com/robfig/cron"
 )
 
 // ListTasks -
@@ -25,7 +23,7 @@ func ListTasks(t *TaskService) http.HandlerFunc {
 }
 
 // CreateTask -
-func CreateTask(t *TaskService, scheduler *cron.Cron) http.HandlerFunc {
+func CreateTask(t *TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var input NewInputTask
 		decoder := json.NewDecoder(r.Body)
@@ -34,10 +32,6 @@ func CreateTask(t *TaskService, scheduler *cron.Cron) http.HandlerFunc {
 			respondWithError(w, http.StatusInternalServerError, RequestError, err.Error())
 			return
 		}
-
-		scheduler.AddFunc(input.Schedule, func() {
-			exec.Command(input.Executor)
-		})
 
 		tasks, err := t.Create(&input)
 

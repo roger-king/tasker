@@ -7,12 +7,14 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron"
 	"github.com/roger-king/tasker/pkg"
+	db "upper.io/db.v3"
 )
 
 // Tasker -
 type Tasker struct {
-	TaskService *pkg.TaskService
-	Scheduler   *cron.Cron
+	Client    *redis.Client
+	DB        db.Database
+	Scheduler *cron.Cron
 }
 
 type TaskerConfig struct {
@@ -49,9 +51,7 @@ func New(tc *TaskerConfig) *Tasker {
 
 	return &Tasker{
 		Scheduler: cron.New(),
-		TaskService: &pkg.TaskService{
-			Client: client,
-		},
+		Client:    client,
 	}
 }
 
@@ -59,15 +59,20 @@ func New(tc *TaskerConfig) *Tasker {
 func (t *Tasker) Start() *mux.Router {
 	log.Println("Starting tasker")
 	t.Scheduler.Start()
+	taskService := &pkg.TaskService{
+		Client:    t.Client,
+		DB:        t.DB,
+		Scheduler: t.Scheduler,
+	}
 
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/api").Subrouter()
-	apiRouter.HandleFunc("/tasks", pkg.ListTasks(t.TaskService)).Methods("GET")
-	apiRouter.HandleFunc("/tasks", pkg.CreateTask(t.TaskService, t.Scheduler)).Methods("POST")
+	apiRouter.HandleFunc("/tasks", pkg.ListTasks(taskService)).Methods("GET")
+	apiRouter.HandleFunc("/tasks", pkg.CreateTask(taskService)).Methods("POST")
 
 	// Single Task Routes
-	apiRouter.HandleFunc("/tasks/{taskID}", pkg.FindTask(t.TaskService)).Methods("GET")
+	apiRouter.HandleFunc("/tasks/{taskID}", pkg.FindTask(taskService)).Methods("GET")
 	// apiRouter.HandleFunc("/tasks/{taskID}/disable", pkg.DisableTask(session)).Methods("PATCH")
-	apiRouter.HandleFunc("/tasks/{taskID}", pkg.DeleteTask(t.TaskService)).Methods("DELETE")
+	apiRouter.HandleFunc("/tasks/{taskID}", pkg.DeleteTask(taskService)).Methods("DELETE")
 	return r
 }
