@@ -95,33 +95,36 @@ func (m *MongoService) Create(newTask *NewInputTask) (*Task, error) {
 	return task, nil
 }
 
-// // Update -
-// func (m *MongoService) Update(updatedTask *Task) (*Task, error) {
-// 	updatedTask.UpdatedAt = time.Now()
+// Update -
+func (m *MongoService) Update(updatedTask *Task) (*Task, error) {
+	var task Task
+	updatedTask.UpdatedAt = time.Now()
 
-// 	_, err := m.Collection.Insert(updatedTask)
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	err := m.Collection.FindOneAndUpdate(ctx, bson.M{"taskId": updatedTask.TaskID}, updatedTask).Decode(&task)
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
+	if err != nil {
+		log.Info("Not working")
+		return nil, err
+	}
 
-// 	return updatedTask, nil
-// }
+	return &task, nil
+}
 
-// // FindOne -
-// func (m *MongoService) FindOne(taskID string) (*Task, error) {
-// 	var err error
-// 	var task Task
+// FindOne -
+func (m *MongoService) FindOne(taskID string) (*Task, error) {
+	var task Task
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	err := m.Collection.FindOne(ctx, bson.M{"taskId": taskID}).Decode(&task)
 
-// 	res := m.Collection.Find("taskId", taskID)
-// 	err = res.One(&task)
+	if err != nil {
+		return nil, err
+	}
 
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &task, nil
-// }
+	return &task, nil
+}
 
 // // Disable -
 // func (m *MongoService) Disable(taskID string) error {
