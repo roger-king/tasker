@@ -1,52 +1,32 @@
 package pkg
 
 import (
-	"log"
+	"context"
+	"time"
 
-	db "upper.io/db.v3"
-	"upper.io/db.v3/mongo"
+	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
-type ConnectionDetails struct {
-	Host     string `required:"true"`
-	User     string `required:"true"`
-	Password string `required:"true"`
-	DBName   string `required:"true"`
-}
-
-// MongoConnectionOptions -
-type MongoConnectionOptions struct {
-	AuthSource string
-}
-
-// MongoConnectionURL -
-type MongoConnectionURL struct {
-	DBName   string
-	Host     string
-	Port     string
-	User     string
-	Password string
-	Options  MongoConnectionOptions
-}
-
 // NewMongoConnection - creates a MongoConnection instance
-func NewMongoConnection() (db.Database, error) {
-	options := make(map[string]string)
-	options["authSource"] = "admin"
-
-	settings := mongo.ConnectionURL{
-		Database: `cronus`,
-		Host:     `127.0.0.1`,
-		User:     `appuser`,
-		Password: `appuser`,
-		Options:  options,
-	}
-
-	session, err := mongo.Open(settings)
+func NewMongoConnection(c string) (*mongo.Client, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(c))
 
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	return session, nil
+	err = client.Ping(ctx, readpref.Primary())
+
+	if err != nil {
+		log.Fatal("Cannot connect to mongo database")
+		return nil, err
+	}
+
+	log.Info("Connected to database")
+	return client, nil
 }

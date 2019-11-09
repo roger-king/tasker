@@ -1,32 +1,17 @@
 package pkg
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
-	"github.com/robfig/cron"
-	db "upper.io/db.v3"
+	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
+	"gopkg.in/mgo.v2/bson"
 )
 
-// Task - Task is the main object describing the collection
-type MongoTask struct {
-	TaskID       string                 `json:"taskId" bson:"taskId"`
-	EntryID      int                    `json:"entryId" bson:"entryId"`
-	Name         string                 `json:"name" bson:"name"`
-	Executor     string                 `json:"executor" bson:"executor"`
-	Schedule     string                 `json:"schedule" bson:"schedule"`
-	IsRepeatable bool                   `json:"isRepeatable" bson:"isRepeatable"`
-	IsSet        bool                   `json:"isSet" bson:"isSet"`
-	Enabled      bool                   `json:"enabled" bson:"enabled"`
-	Complete     bool                   `json:"complete" bson:"complete"`
-	Args         map[string]interface{} `json:"args" bson:"args"`
-	CreatedAt    time.Time              `json:"createdAt" bson:"createdAt"`
-	UpdatedAt    time.Time              `json:"updatedAt" bson:"updatedAt"`
-	DeletedAt    time.Time              `json:"deletedAt" bson:"deletedAt"`
-}
-
 // BeforeCreate - hook for creation
-func (t *MongoTask) BeforeCreate() {
+func (t *Task) BeforeCreate() {
 	t.TaskID = uuid.New().String()
 	t.IsSet = true
 	t.Enabled = true
@@ -37,12 +22,12 @@ func (t *MongoTask) BeforeCreate() {
 
 // MongoService - a service to interact with a task
 type MongoService struct {
-	Collection db.Collection
+	Collection *mongo.Collection
 }
 
 // NewMongoService - initializes task service
-func NewMongoService(db db.Database) *MongoService {
-	collection := db.Collection("tasks")
+func NewMongoService(db *mongo.Client) *MongoService {
+	collection := db.Database("tasker").Collection("tasks")
 
 	return &MongoService{
 		Collection: collection,
@@ -52,84 +37,121 @@ func NewMongoService(db db.Database) *MongoService {
 // List - List operation for task service
 func (m *MongoService) List() ([]*Task, error) {
 	var tasks []*Task
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	cur, err := m.Collection.Find(ctx, bson.M{})
 
-	results := m.Collection.Find()
-	err := results.All(&tasks)
-	return tasks, err
+	if err != nil {
+		log.Info("This is dumb", err)
+		return nil, err
+	}
+
+	defer cur.Close(ctx)
+
+	for cur.Next(ctx) {
+		var task *Task
+
+		err := cur.Decode(&task)
+
+		if err != nil {
+			return nil, err
+		}
+
+		tasks = append(tasks, task)
+	}
+
+	return tasks, nil
 }
 
 // ListEnabledTasks - List all tasks that are enabled
 // TODO: dynamically add the filter
-func (m *MongoService) ListEnabledTasks(opts *TaskSearchOptions) ([]*Task, error) {
-	var tasks []*Task
+// func (m *MongoService) ListEnabledTasks(opts *TaskSearchOptions) ([]*Task, error) {
+// 	var tasks []*Task
 
-	results := m.Collection.Find("enabled", opts.Enabled)
-	err := results.All(&tasks)
-	return tasks, err
-}
+// 	results := m.Collection.Find("enabled", opts.Enabled)
+// 	err := results.All(&tasks)
+// 	return tasks, err
+// }
 
 // Create - create operation for task service
-func (m *MongoService) Create(newTask *NewInputTask, scheduler *cron.Cron) (interface{}, error) {
-	task := &MongoTask{
-		Name:     newTask.Name,
-		Schedule: newTask.Schedule,
+func (m *MongoService) Create(newTask *NewInputTask) (*Task, error) {
+	task := &Task{
+		Name:         newTask.Name,
+		Schedule:     newTask.Schedule,
+		Executor:     newTask.Executor,
+		IsRepeatable: newTask.IsRepeatable,
+		Args:         newTask.Args,
 	}
 
 	task.BeforeCreate()
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	_, err := m.Collection.InsertOne(ctx, task)
 
-	createdTask, err := m.Collection.Insert(task)
-
+	defer cancel()
 	if err != nil {
 		return nil, err
 	}
 
-	return createdTask, nil
+	return task, nil
 }
 
-// FindOne -
-func (m *MongoService) FindOne(taskID string) (*Task, error) {
-	var err error
-	var task Task
+// // Update -
+// func (m *MongoService) Update(updatedTask *Task) (*Task, error) {
+// 	updatedTask.UpdatedAt = time.Now()
 
-	res := m.Collection.Find("taskId", taskID)
-	err = res.One(&task)
+// 	_, err := m.Collection.Insert(updatedTask)
 
-	if err != nil {
-		return nil, err
-	}
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	return &task, nil
-}
+// 	return updatedTask, nil
+// }
 
-// Disable -
-func (m *MongoService) Disable(taskID string) error {
-	var err error
-	var task MongoTask
+// // FindOne -
+// func (m *MongoService) FindOne(taskID string) (*Task, error) {
+// 	var err error
+// 	var task Task
 
-	res := m.Collection.Find("taskId", taskID)
+// 	res := m.Collection.Find("taskId", taskID)
+// 	err = res.One(&task)
 
-	err = res.One(&task)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	if err != nil {
-		return err
-	}
+// 	return &task, nil
+// }
 
-	task.Enabled = false
-	err = res.Update(task)
+// // Disable -
+// func (m *MongoService) Disable(taskID string) error {
+// 	var err error
+// 	var task Task
 
-	if err != nil {
-		return err
-	}
+// 	res := m.Collection.Find("taskId", taskID)
 
-	return nil
-}
+// 	err = res.One(&task)
 
-// Delete -
-func (m *MongoService) Delete(taskID string) error {
-	var err error
+// 	if err != nil {
+// 		return err
+// 	}
 
-	res := m.Collection.Find("taskId", taskID)
-	err = res.Delete()
+// 	task.Enabled = false
+// 	err = res.Update(task)
 
-	return err
-}
+// 	if err != nil {
+// 		return err
+// 	}
+
+// 	return nil
+// }
+
+// // Delete -
+// func (m *MongoService) Delete(taskID string) error {
+// 	var err error
+
+// 	res := m.Collection.Find("taskId", taskID)
+// 	err = res.Delete()
+
+// 	return err
+// }

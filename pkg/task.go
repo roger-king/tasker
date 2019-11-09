@@ -1,15 +1,10 @@
 package pkg
 
 import (
-	"encoding/json"
-	"fmt"
-	"plugin"
 	"time"
 
-	"github.com/go-redis/redis"
-	"github.com/google/uuid"
 	cron "github.com/robfig/cron/v3"
-	db "upper.io/db.v3"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ITask interface {
@@ -28,7 +23,7 @@ type Payload interface {
 
 type Task struct {
 	TaskID       string                 `json:"taskId" bson:"taskId"`
-	EntryID      int                    `json:"entryId" bson:"entryId"`
+	EntryID      cron.EntryID           `json:"entryId" bson:"entryId"`
 	Name         string                 `json:"name" bson:"name"`
 	Executor     string                 `json:"executor" bson:"executor"`
 	Schedule     string                 `json:"schedule" bson:"schedule"`
@@ -44,8 +39,7 @@ type Task struct {
 
 // TaskService - This is a wrapper around Tasker object
 type TaskService struct {
-	Client    *redis.Client
-	DB        db.Database
+	DB        *mongo.Client
 	Scheduler *cron.Cron
 }
 
@@ -61,133 +55,113 @@ func (t *TaskService) List() ([]*Task, error) {
 	return tasks, nil
 }
 
-func (t *TaskService) Create(task *NewInputTask) (*Task, error) {
-	createdTask := &Task{
-		TaskID:    uuid.New().String(),
-		Name:      task.Name,
-		Schedule:  task.Schedule,
-		Args:      task.Args,
-		IsSet:     true,
-		Enabled:   true,
-		Complete:  false,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-	}
-
-	entryId, err := t.Scheduler.AddFunc(task.Schedule, func() {
-		var this Task
-		jsonString, err := t.Client.Get(createdTask.TaskID).Result()
-
-		if err != nil {
-			fmt.Print("Error turning args to jsonString")
-			return
-		}
-
-		json.Unmarshal([]byte(jsonString), &this)
-
-		if this.Enabled && !this.Complete {
-			plug, err := plugin.Open(fmt.Sprintf("./plugins/%s.so", task.Executor))
-
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			run, err := plug.Lookup("Run")
-
-			if err != nil {
-				fmt.Println(err)
-				return
-			}
-
-			err = run.(func(map[string]interface{}) error)(task.Args)
-
-			if err != nil {
-				fmt.Print(err)
-				return
-			}
-
-			if !this.IsRepeatable {
-				this.Complete = true
-				this.Enabled = false
-				this.UpdatedAt = time.Now()
-				this.DeletedAt = time.Now()
-
-				bt, _ := json.Marshal(this)
-
-				err = t.Client.Set(this.TaskID, string(bt), 0).Err()
-
-				if err != nil {
-					fmt.Print("failed to mark as complete")
-					return
-				}
-
-				t.Scheduler.Remove(cron.EntryID(this.EntryID))
-			}
-		}
-	})
+func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
+	m := NewMongoService(t.DB)
+	createdTask, err := m.Create(i)
 
 	if err != nil {
-		// Failed to set job
-		fmt.Println("Failed to set job", err)
 		return nil, err
 	}
 
-	createdTask.EntryID = int(entryId)
+	// entryId, err := t.Scheduler.AddFunc(i.Schedule, func() {
+	// 	this, err := m.FindOne(createdTask.TaskID)
 
-	if t.Client != nil {
-		var taskMap map[string]interface{}
-		bt, err := json.Marshal(createdTask)
-		if err != nil {
-			return nil, err
-		}
+	// 	if err != nil {
+	// 		return
+	// 	}
 
-		json.Unmarshal([]byte(bt), &taskMap)
+	// 	if this.Enabled && !this.Complete {
+	// 		plug, err := plugin.Open(fmt.Sprintf("./plugins/%s.so", this.Executor))
 
-		err = t.Client.HMSet(createdTask.TaskID, taskMap).Err()
+	// 		if err != nil {
+	// 			fmt.Println(err)
+	// 			return
+	// 		}
 
-		if err != nil {
-			return nil, err
-		}
-	}
+	// 		run, err := plug.Lookup("Run")
+
+	// 		if err != nil {
+	// 			fmt.Println(err)
+	// 			return
+	// 		}
+
+	// 		err = run.(func(map[string]interface{}) error)(this.Args)
+
+	// 		if err != nil {
+	// 			fmt.Print(err)
+	// 			return
+	// 		}
+
+	// 		if !this.IsRepeatable {
+	// 			this.Complete = true
+	// 			this.Enabled = false
+	// 			this.UpdatedAt = time.Now()
+	// 			this.DeletedAt = time.Now()
+
+	// 			bt, _ := json.Marshal(this)
+
+	// 			err = t.Client.Set(this.TaskID, string(bt), 0).Err()
+
+	// 			if err != nil {
+	// 				fmt.Print("failed to mark as complete")
+	// 				return
+	// 			}
+
+	// 			t.Scheduler.Remove(cron.EntryID(this.EntryID))
+	// 		}
+	// 	}
+	// })
+
+	// if err != nil {
+	// 	// Failed to set job
+	// 	return nil, err
+	// }
+
+	// createdTask.EntryID = entryId
+
+	// _, err = m.Update(createdTask)
+
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	return createdTask, nil
 }
 
-func (t *TaskService) Find(id string) (*Task, error) {
-	var task Task
+// func (t *TaskService) Find(id string) (*Task, error) {
+// 	var task Task
 
-	if t.Client != nil {
-		value, err := t.Client.Get(id).Result()
+// 	if t.Client != nil {
+// 		value, err := t.Client.Get(id).Result()
 
-		if err != nil {
-			// Cannot find values for key
-			return nil, err
-		}
+// 		if err != nil {
+// 			// Cannot find values for key
+// 			return nil, err
+// 		}
 
-		err = json.Unmarshal([]byte(value), &task)
+// 		err = json.Unmarshal([]byte(value), &task)
 
-		if err != nil {
-			// log.Error("Failed to marshal data")
-			return nil, err
-		}
-	}
+// 		if err != nil {
+// 			// log.Error("Failed to marshal data")
+// 			return nil, err
+// 		}
+// 	}
 
-	return &task, nil
-}
+// 	return &task, nil
+// }
 
-func (t *TaskService) Delete(id string) (bool, error) {
-	if t.Client != nil {
-		err := t.Client.Del(id).Err()
+// func (t *TaskService) Delete(id string) (bool, error) {
+// 	if t.Client != nil {
+// 		err := t.Client.Del(id).Err()
 
-		if err != nil {
-			// Cannot find values for key
-			return false, err
-		}
-	}
+// 		if err != nil {
+// 			// Cannot find values for key
+// 			return false, err
+// 		}
+// 	}
 
-	return true, nil
-}
+// 	return true, nil
+// }
 
 // NewInputTask - object to store all parameters for creating a new task
 type NewInputTask struct {
@@ -196,6 +170,7 @@ type NewInputTask struct {
 	Schedule     string                 `json:"schedule"`
 	IsRepeatable bool                   `json:"isRepeatable"`
 	Executor     string                 `json:"executor"`
+	EntryID      cron.EntryID           `json:"entryId"`
 }
 
 // TaskSearchOptions -

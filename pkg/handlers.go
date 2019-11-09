@@ -3,16 +3,12 @@ package pkg
 import (
 	"encoding/json"
 	"net/http"
-
-	"github.com/gorilla/mux"
 )
 
 // ListTasks -
 func ListTasks(t *TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tasks, err := t.List()
-
-		defer t.DB.Close()
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "", err.Error())
@@ -47,21 +43,21 @@ func CreateTask(t *TaskService) http.HandlerFunc {
 	}
 }
 
-// FindOneTask -
-func FindTask(t *TaskService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		task, err := t.Find(vars["taskID"])
+// // FindOneTask -
+// func FindTask(t *TaskService) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		vars := mux.Vars(r)
+// 		task, err := t.Find(vars["taskID"])
 
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-			return
-		}
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+// 			return
+// 		}
 
-		respondWithJSON(w, http.StatusOK, task)
-		return
-	}
-}
+// 		respondWithJSON(w, http.StatusOK, task)
+// 		return
+// 	}
+// }
 
 // // DisableTask -
 // func DisableTask(session db.Database) http.HandlerFunc {
@@ -83,20 +79,20 @@ func FindTask(t *TaskService) http.HandlerFunc {
 // }
 
 // DeleteTask -
-func DeleteTask(t *TaskService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		ok, err := t.Delete(vars["taskID"])
+// func DeleteTask(t *TaskService) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		vars := mux.Vars(r)
+// 		ok, err := t.Delete(vars["taskID"])
 
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-			return
-		}
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+// 			return
+// 		}
 
-		respondWithJSON(w, http.StatusOK, ok)
-		return
-	}
-}
+// 		respondWithJSON(w, http.StatusOK, ok)
+// 		return
+// 	}
+// }
 
 // Response Helpers:
 type errorHelper struct {
