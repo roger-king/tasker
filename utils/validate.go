@@ -2,7 +2,7 @@ package utils
 
 import "encoding/json"
 
-func Validate(args map[string]interface{}, p *interface{}) error {
+func Validate(args map[string]interface{}, p interface{}) error {
 	jsonString, err := json.Marshal(args)
 
 	if err != nil {
