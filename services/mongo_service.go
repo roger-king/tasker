@@ -1,23 +1,14 @@
-package pkg
+package services
 
 import (
 	"context"
 	"time"
 
-	"github.com/google/uuid"
+	"github.com/roger-king/tasker/models"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-// BeforeCreate - hook for creation
-func (t *Task) BeforeCreate() {
-	t.TaskID = uuid.New().String()
-	t.Enabled = true
-	t.Complete = false
-	t.CreatedAt = time.Now()
-	t.UpdatedAt = time.Now()
-}
 
 // MongoService - a service to interact with a task
 type MongoService struct {
@@ -34,8 +25,8 @@ func NewMongoService(db *mongo.Client) *MongoService {
 }
 
 // List - List operation for task service
-func (m *MongoService) List() ([]*Task, error) {
-	var tasks []*Task
+func (m *MongoService) List() ([]*models.Task, error) {
+	var tasks []*models.Task
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	cur, err := m.Collection.Find(ctx, bson.M{})
@@ -48,7 +39,7 @@ func (m *MongoService) List() ([]*Task, error) {
 	defer cur.Close(ctx)
 
 	for cur.Next(ctx) {
-		var task *Task
+		var task *models.Task
 
 		err := cur.Decode(&task)
 
@@ -64,8 +55,8 @@ func (m *MongoService) List() ([]*Task, error) {
 
 // ListEnabledTasks - List all tasks that are enabled
 // TODO: dynamically add the filter
-// func (m *MongoService) ListEnabledTasks(opts *TaskSearchOptions) ([]*Task, error) {
-// 	var tasks []*Task
+// func (m *MongoService) ListEnabledTasks(opts *models.TaskSearchOptions) ([]*models.Task, error) {
+// 	var tasks []*models.Task
 
 // 	results := m.Collection.Find("enabled", opts.Enabled)
 // 	err := results.All(&tasks)
@@ -73,8 +64,8 @@ func (m *MongoService) List() ([]*Task, error) {
 // }
 
 // Create - create operation for task service
-func (m *MongoService) Create(newTask *NewInputTask) (*Task, error) {
-	task := &Task{
+func (m *MongoService) Create(newTask *models.NewInputTask) (*models.Task, error) {
+	task := &models.Task{
 		Name:         newTask.Name,
 		Schedule:     newTask.Schedule,
 		Executor:     newTask.Executor,
@@ -94,7 +85,7 @@ func (m *MongoService) Create(newTask *NewInputTask) (*Task, error) {
 	return task, nil
 }
 
-func (m *MongoService) Update(updatedTask *Task) error {
+func (m *MongoService) Update(updatedTask *models.Task) error {
 	var docUpdatedTask bson.M
 	// var updateDoc bson.DocElem
 	updatedTask.UpdatedAt = time.Now()
@@ -132,8 +123,8 @@ func (m *MongoService) Update(updatedTask *Task) error {
 }
 
 // FindOne -
-func (m *MongoService) FindOne(taskID string) (*Task, error) {
-	var task Task
+func (m *MongoService) FindOne(taskID string) (*models.Task, error) {
+	var task models.Task
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 	err := m.Collection.FindOne(ctx, bson.M{"taskId": taskID}).Decode(&task)

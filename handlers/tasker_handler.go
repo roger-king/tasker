@@ -1,4 +1,4 @@
-package pkg
+package handlers
 
 import (
 	"encoding/json"
@@ -7,10 +7,13 @@ import (
 	"net/url"
 
 	"github.com/gorilla/mux"
+	"github.com/roger-king/tasker/models"
+	"github.com/roger-king/tasker/services"
+	"github.com/roger-king/tasker/utils"
 )
 
 // ListTasks -
-func ListTasks(t *TaskService) http.HandlerFunc {
+func ListTasks(t *services.TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		tasks, err := t.List()
 
@@ -25,20 +28,20 @@ func ListTasks(t *TaskService) http.HandlerFunc {
 }
 
 // CreateTask -
-func CreateTask(t *TaskService) http.HandlerFunc {
+func CreateTask(t *services.TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var input NewInputTask
+		var input models.NewInputTask
 		decoder := json.NewDecoder(r.Body)
 
 		if err := decoder.Decode(&input); err != nil {
-			respondWithError(w, http.StatusInternalServerError, RequestError, err.Error())
+			respondWithError(w, http.StatusInternalServerError, utils.RequestError, err.Error())
 			return
 		}
 
 		tasks, err := t.Create(&input)
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
 			return
 		}
 
@@ -48,13 +51,13 @@ func CreateTask(t *TaskService) http.HandlerFunc {
 }
 
 // FindOneTask -
-func FindTask(t *TaskService) http.HandlerFunc {
+func FindTask(t *services.TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		task, err := t.Find(vars["taskID"])
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
 			return
 		}
 
@@ -64,13 +67,13 @@ func FindTask(t *TaskService) http.HandlerFunc {
 }
 
 // DisableTask -
-func DisableTask(t *TaskService) http.HandlerFunc {
+func DisableTask(t *services.TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		err := t.Disable(vars["taskID"])
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
 			return
 		}
 
@@ -80,13 +83,13 @@ func DisableTask(t *TaskService) http.HandlerFunc {
 }
 
 // DeleteTask -
-func DeleteTask(t *TaskService) http.HandlerFunc {
+func DeleteTask(t *services.TaskService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		err := t.Delete(vars["taskID"])
 
 		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
 			return
 		}
 
@@ -98,7 +101,7 @@ func DeleteTask(t *TaskService) http.HandlerFunc {
 // ServeWebAdmin -
 func ServeWebAdmin(w http.ResponseWriter, r *http.Request) {
 
-	if len(TaskerEnv) == 0 || TaskerEnv == "local" {
+	if len(utils.TaskerEnv) == 0 || utils.TaskerEnv == "local" {
 		url, _ := url.Parse("http://localhost:3000")
 		// create the reverse proxy
 		proxy := httputil.NewSingleHostReverseProxy(url)
@@ -113,30 +116,4 @@ func ServeWebAdmin(w http.ResponseWriter, r *http.Request) {
 		proxy.ServeHTTP(w, r)
 	}
 	return
-}
-
-// Response Helpers:
-type errorHelper struct {
-	Error       string `json:"error"`
-	Description string `json:"description"`
-}
-
-type dataHelper struct {
-	Data interface{} `json:"data"`
-}
-
-func respondWithError(w http.ResponseWriter, code int, errorType HTTPError, message string) {
-	response, _ := json.Marshal(&errorHelper{Error: errorType.String(), Description: message})
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(response)
-}
-
-func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
-	response, _ := json.Marshal(&dataHelper{Data: payload})
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(code)
-	w.Write(response)
 }
