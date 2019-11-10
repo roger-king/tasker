@@ -55,3 +55,4 @@ Below are the availble of environment variables that Tasker looks for (note: pre
 - [ ] Allow for plugin registry
 - [ ] Allow to pull plugins from github via tags and versioning schema
 - [ ] Allow for pluging in your own DB
+- [ ] Investigate `tasker` plugin
