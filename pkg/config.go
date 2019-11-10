@@ -22,4 +22,7 @@ var (
 
 	// ScriptRoot -
 	ScriptRoot = os.Getenv("TASKER_SCRIPT_ROOT")
+
+	// TASKER_ENV -
+	TaskerEnv = os.Getenv("TASKER_ENV")
 )

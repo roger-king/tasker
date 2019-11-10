@@ -3,6 +3,8 @@ package pkg
 import (
 	"encoding/json"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 
 	"github.com/gorilla/mux"
 )
@@ -91,6 +93,26 @@ func DeleteTask(t *TaskService) http.HandlerFunc {
 		respondWithJSON(w, http.StatusOK, true)
 		return
 	}
+}
+
+// ServeWebAdmin -
+func ServeWebAdmin(w http.ResponseWriter, r *http.Request) {
+
+	if len(TaskerEnv) == 0 || TaskerEnv == "local" {
+		url, _ := url.Parse("http://localhost:3000")
+		// create the reverse proxy
+		proxy := httputil.NewSingleHostReverseProxy(url)
+
+		// Update the headers to allow for SSL redirection
+		r.URL.Host = url.Host
+		r.URL.Scheme = url.Scheme
+		r.Header.Set("X-Forwarded-Host", r.Header.Get("Host"))
+		r.Host = url.Host
+
+		// Note that ServeHttp is non blocking and uses a go routine under the hood
+		proxy.ServeHTTP(w, r)
+	}
+	return
 }
 
 // Response Helpers:

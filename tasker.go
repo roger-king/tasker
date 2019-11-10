@@ -65,5 +65,9 @@ func (t *Tasker) Start() *mux.Router {
 	apiRouter.HandleFunc("/tasks/{taskID}", pkg.FindTask(taskService)).Methods("GET")
 	apiRouter.HandleFunc("/tasks/{taskID}/disable", pkg.DisableTask(taskService)).Methods("PATCH")
 	apiRouter.HandleFunc("/tasks/{taskID}", pkg.DeleteTask(taskService)).Methods("DELETE")
+
+	// Web Admin - We have a reverse proxy for working on local developer :)
+	r.PathPrefix("/static/").HandlerFunc(pkg.ServeWebAdmin)
+	apiRouter.PathPrefix("/admin").HandlerFunc(pkg.ServeWebAdmin)
 	return r
 }
