@@ -3,6 +3,8 @@ package pkg
 import (
 	"encoding/json"
 	"net/http"
+
+	"github.com/gorilla/mux"
 )
 
 // ListTasks -
@@ -43,56 +45,53 @@ func CreateTask(t *TaskService) http.HandlerFunc {
 	}
 }
 
-// // FindOneTask -
-// func FindTask(t *TaskService) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		vars := mux.Vars(r)
-// 		task, err := t.Find(vars["taskID"])
+// FindOneTask -
+func FindTask(t *TaskService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		task, err := t.Find(vars["taskID"])
 
-// 		if err != nil {
-// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-// 			return
-// 		}
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			return
+		}
 
-// 		respondWithJSON(w, http.StatusOK, task)
-// 		return
-// 	}
-// }
+		respondWithJSON(w, http.StatusOK, task)
+		return
+	}
+}
 
-// // DisableTask -
-// func DisableTask(session db.Database) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		vars := mux.Vars(r)
-// 		defer session.Close()
+// DisableTask -
+func DisableTask(t *TaskService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		err := t.Disable(vars["taskID"])
 
-// 		taskService := NewTaskService(session)
-// 		err := taskService.Disable(vars["taskID"])
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			return
+		}
 
-// 		if err != nil {
-// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-// 			return
-// 		}
-
-// 		respondWithJSON(w, http.StatusOK, "")
-// 		return
-// 	}
-// }
+		respondWithJSON(w, http.StatusOK, true)
+		return
+	}
+}
 
 // DeleteTask -
-// func DeleteTask(t *TaskService) http.HandlerFunc {
-// 	return func(w http.ResponseWriter, r *http.Request) {
-// 		vars := mux.Vars(r)
-// 		ok, err := t.Delete(vars["taskID"])
+func DeleteTask(t *TaskService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		err := t.Delete(vars["taskID"])
 
-// 		if err != nil {
-// 			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
-// 			return
-// 		}
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, ProcessingError, err.Error())
+			return
+		}
 
-// 		respondWithJSON(w, http.StatusOK, ok)
-// 		return
-// 	}
-// }
+		respondWithJSON(w, http.StatusOK, true)
+		return
+	}
+}
 
 // Response Helpers:
 type errorHelper struct {

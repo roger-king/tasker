@@ -94,9 +94,7 @@ func (m *MongoService) Create(newTask *NewInputTask) (*Task, error) {
 	return task, nil
 }
 
-// Update -
-func (m *MongoService) Update(updatedTask *Task) (*Task, error) {
-	var task *Task
+func (m *MongoService) Update(updatedTask *Task) error {
 	var docUpdatedTask bson.M
 	// var updateDoc bson.DocElem
 	updatedTask.UpdatedAt = time.Now()
@@ -107,14 +105,14 @@ func (m *MongoService) Update(updatedTask *Task) (*Task, error) {
 	bUpdatedTask, err := bson.Marshal(updatedTask)
 
 	if err != nil {
-		return nil, err
+		return err
 	}
 
 	err = bson.Unmarshal(bUpdatedTask, &docUpdatedTask)
 
 	if err != nil {
 		log.Error("Logging error")
-		return nil, err
+		return err
 	}
 
 	update := bson.D{
@@ -124,14 +122,13 @@ func (m *MongoService) Update(updatedTask *Task) (*Task, error) {
 		},
 	}
 
-	err = m.Collection.FindOneAndUpdate(ctx, bson.M{"taskId": updatedTask.TaskID}, update).Decode(&task)
+	_, err = m.Collection.UpdateOne(ctx, bson.M{"taskId": updatedTask.TaskID}, update)
 
 	if err != nil {
-		log.Info("Not working")
-		return nil, err
+		return err
 	}
 
-	return task, nil
+	return nil
 }
 
 // FindOne -
@@ -148,35 +145,16 @@ func (m *MongoService) FindOne(taskID string) (*Task, error) {
 	return &task, nil
 }
 
-// // Disable -
-// func (m *MongoService) Disable(taskID string) error {
-// 	var err error
-// 	var task Task
+// Delete -
+func (m *MongoService) Delete(taskID string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
 
-// 	res := m.Collection.Find("taskId", taskID)
+	_, err := m.Collection.DeleteOne(ctx, bson.M{"taskId": taskID})
 
-// 	err = res.One(&task)
+	if err != nil {
+		return err
+	}
 
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	task.Enabled = false
-// 	err = res.Update(task)
-
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	return nil
-// }
-
-// // Delete -
-// func (m *MongoService) Delete(taskID string) error {
-// 	var err error
-
-// 	res := m.Collection.Find("taskId", taskID)
-// 	err = res.Delete()
-
-// 	return err
-// }
+	return nil
+}

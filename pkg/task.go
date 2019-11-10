@@ -100,7 +100,7 @@ func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
 				this.UpdatedAt = time.Now()
 				this.DeletedAt = time.Now()
 
-				_, err = m.Update(this)
+				err = m.Update(this)
 
 				if err != nil {
 					log.Error("Failed to mark as complete")
@@ -119,7 +119,7 @@ func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
 
 	createdTask.EntryID = entryId
 
-	_, err = m.Update(createdTask)
+	err = m.Update(createdTask)
 
 	if err != nil {
 		return nil, err
@@ -128,40 +128,58 @@ func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
 	return createdTask, nil
 }
 
-// func (t *TaskService) Find(id string) (*Task, error) {
-// 	var task Task
+func (t *TaskService) Find(id string) (*Task, error) {
+	m := NewMongoService(t.DB)
+	task, err := m.FindOne(id)
 
-// 	if t.Client != nil {
-// 		value, err := t.Client.Get(id).Result()
+	if err != nil {
+		return nil, err
+	}
 
-// 		if err != nil {
-// 			// Cannot find values for key
-// 			return nil, err
-// 		}
+	return task, nil
+}
 
-// 		err = json.Unmarshal([]byte(value), &task)
+func (t *TaskService) Disable(id string) error {
+	m := NewMongoService(t.DB)
+	task, err := m.FindOne(id)
 
-// 		if err != nil {
-// 			// log.Error("Failed to marshal data")
-// 			return nil, err
-// 		}
-// 	}
+	if err != nil {
+		return err
+	}
 
-// 	return &task, nil
-// }
+	task.Enabled = false
+	task.UpdatedAt = time.Now()
 
-// func (t *TaskService) Delete(id string) (bool, error) {
-// 	if t.Client != nil {
-// 		err := t.Client.Del(id).Err()
+	err = m.Update(task)
 
-// 		if err != nil {
-// 			// Cannot find values for key
-// 			return false, err
-// 		}
-// 	}
+	if err != nil {
+		return err
+	}
 
-// 	return true, nil
-// }
+	t.Scheduler.Remove(task.EntryID)
+
+	return nil
+}
+
+// Delete -
+func (t *TaskService) Delete(id string) error {
+	m := NewMongoService(t.DB)
+	task, err := m.FindOne(id)
+
+	if err != nil {
+		return err
+	}
+
+	err = m.Delete(id)
+
+	if err != nil {
+		return err
+	}
+
+	t.Scheduler.Remove(task.EntryID)
+
+	return nil
+}
 
 // NewInputTask - object to store all parameters for creating a new task
 type NewInputTask struct {
