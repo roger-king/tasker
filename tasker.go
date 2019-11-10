@@ -5,7 +5,6 @@ import (
 
 	"github.com/gorilla/mux"
 	cron "github.com/robfig/cron/v3"
-	"github.com/roger-king/tasker/db"
 	"github.com/roger-king/tasker/handlers"
 	"github.com/roger-king/tasker/services"
 	log "github.com/sirupsen/logrus"
@@ -36,7 +35,7 @@ func init() {
 
 // New - Creates a new instance of tasker
 func New(tc *TaskerConfig) *Tasker {
-	m, err := db.NewMongoConnection(tc.MongoConnectionURL)
+	m, err := services.NewMongoConnection(tc.MongoConnectionURL)
 
 	if err != nil {
 		log.Panic(err)
