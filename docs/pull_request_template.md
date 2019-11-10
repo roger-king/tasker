@@ -3,7 +3,7 @@
 
   Title of PR should be as follows:
 
-  <type>(<ticket>): <summary>
+  <type>(<closing keyboard> #<issue number>): <summary>
 
   Allowed <type>:
     feat (feature)
@@ -14,12 +14,14 @@
     test (when adding missing tests)
     chore (maintain)
 
-  For example: chore(INFRAAUTO-1): updating documentation
+  Allowed closing keywords: https://help.github.com/en/github/managing-your-work-on-github/closing-issues-using-keywords
+
+  For example: chore(resolves #1): updating documentation
 -->
 
 #### What does the PR do?
 
-#### Any background context you want to provide? Link to JIRA Ticket?
+#### Any background context you want to provide?
 
 #### Are there any dependencies?
 

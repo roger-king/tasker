@@ -5,10 +5,13 @@ setup:
 
 dev:
 	go run example/main.go
-	
+
 cleanup:
 	rm -rf ./build
 	rm -rf ./vendor
+
+test:
+	go test -v github.com/roger-king/tasker/...
 
 default:
 	setup
