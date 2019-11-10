@@ -3,7 +3,7 @@ package utils
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 var expectedTestPayload = TestPayload{
@@ -11,20 +11,29 @@ var expectedTestPayload = TestPayload{
 }
 
 type TestPayload struct {
-	Name string `json:"name"`
+	Name string `json:"name" validate:"required"`
 }
 
 func TestValidate_ShouldReturnValidStruct(t *testing.T) {
 	var tp TestPayload
 
-	assert := assert.New(t)
 	args := map[string]interface{}{
 		"name": "Steve Rogers",
 	}
 
 	err := Validate(args, &tp)
 
-	assert.NoError(err)
+	require.NoError(t, err)
+	require.Equal(t, expectedTestPayload, tp)
+}
 
-	assert.Equal(expectedTestPayload, tp)
+func TestValidate_ShouldReturnError(t *testing.T) {
+	var tp TestPayload
+
+	args := map[string]interface{}{
+		"wrongKey": "Steve Rogers",
+	}
+
+	err := Validate(args, &tp)
+	require.Error(t, err, "validation error in args and payload")
 }
