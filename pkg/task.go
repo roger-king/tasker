@@ -1,16 +1,13 @@
 package pkg
 
 import (
-	"encoding/json"
 	"fmt"
-	"log"
 	"plugin"
 	"time"
 
-	"github.com/go-redis/redis"
-	"github.com/google/uuid"
-	"github.com/robfig/cron"
-	db "upper.io/db.v3"
+	cron "github.com/robfig/cron/v3"
+	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type ITask interface {
@@ -28,152 +25,170 @@ type Payload interface {
 }
 
 type Task struct {
-	TaskID    string                 `json:"taskId" bson:"taskId"`
-	Name      string                 `json:"name" bson:"name"`
-	Schedule  string                 `json:"schedule" bson:"schedule"`
-	IsSet     bool                   `json:"isSet" bson:"isSet"`
-	Enabled   bool                   `json:"enabled" bson:"enabled"`
-	Complete  bool                   `json:"complete" bson:"complete"`
-	Args      map[string]interface{} `json:"args" bson:"args"`
-	CreatedAt time.Time              `json:"createdAt" bson:"createdAt"`
-	UpdatedAt time.Time              `json:"updatedAt" bson:"updatedAt"`
-	DeletedAt time.Time              `json:"deletedAt" bson:"deletedAt"`
+	TaskID       string                 `json:"taskId" bson:"taskId"`
+	EntryID      cron.EntryID           `json:"entryId" bson:"entryId"`
+	Name         string                 `json:"name" bson:"name"`
+	Executor     string                 `json:"executor" bson:"executor"`
+	Schedule     string                 `json:"schedule" bson:"schedule"`
+	IsRepeatable bool                   `json:"isRepeatable" bson:"isRepeatable"`
+	Enabled      bool                   `json:"enabled" bson:"enabled"`
+	Complete     bool                   `json:"complete" bson:"complete"`
+	Args         map[string]interface{} `json:"args" bson:"args"`
+	CreatedAt    time.Time              `json:"createdAt" bson:"createdAt"`
+	UpdatedAt    time.Time              `json:"updatedAt" bson:"updatedAt"`
+	DeletedAt    time.Time              `json:"deletedAt" bson:"deletedAt"`
 }
 
 // TaskService - This is a wrapper around Tasker object
 type TaskService struct {
-	Client    *redis.Client
-	DB        db.Database
+	DB        *mongo.Client
 	Scheduler *cron.Cron
 }
 
-func (t *TaskService) List() ([]Task, error) {
-	var tasks []Task
+func (t *TaskService) List() ([]*Task, error) {
+	m := NewMongoService(t.DB)
 
-	if t.Client != nil {
-		results, _, err := t.Client.Scan(0, "*", 10).Result()
+	tasks, err := m.List()
 
-		if err != nil {
-			log.Panic(err)
-			return nil, err
-		}
-
-		for _, r := range results {
-			var task Task
-
-			value, err := t.Client.Get(r).Result()
-
-			if err != nil {
-				// Cannot find values for key
-				return nil, err
-			}
-
-			err = json.Unmarshal([]byte(value), &task)
-
-			if err != nil {
-				// log.Error("Failed to marshal data")
-				return nil, err
-			}
-
-			tasks = append(tasks, task)
-		}
+	if err != nil {
+		return nil, err
 	}
 
 	return tasks, nil
 }
 
-func (t *TaskService) Create(task *NewInputTask) (*Task, error) {
-	createdTask := &Task{
-		TaskID:    uuid.New().String(),
-		Name:      task.Name,
-		Schedule:  task.Schedule,
-		IsSet:     true,
-		Enabled:   true,
-		Complete:  false,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
+func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
+	m := NewMongoService(t.DB)
+	createdTask, err := m.Create(i)
+
+	if err != nil {
+		return nil, err
 	}
 
-	t.Scheduler.AddFunc(task.Schedule, func() {
-		plug, err := plugin.Open("./plugins/main.so")
+	entryId, err := t.Scheduler.AddFunc(i.Schedule, func() {
+		this, err := m.FindOne(createdTask.TaskID)
 
 		if err != nil {
-			fmt.Println(err)
 			return
 		}
 
-		run, err := plug.Lookup("Run")
+		if this.Enabled && !this.Complete {
+			plug, err := plugin.Open(fmt.Sprintf("./plugins/%s.so", this.Executor))
 
-		if err != nil {
-			fmt.Println(err)
-			return
-		}
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
 
-		err = run.(func(map[string]interface{}) error)(task.Args)
+			run, err := plug.Lookup("Run")
 
-		if err != nil {
-			fmt.Print(err)
-			return
+			if err != nil {
+				fmt.Println(err)
+				return
+			}
+
+			err = run.(func(map[string]interface{}) error)(this.Args)
+
+			if err != nil {
+				fmt.Print(err)
+				return
+			}
+
+			if !this.IsRepeatable {
+				this.Complete = true
+				this.Enabled = false
+				this.UpdatedAt = time.Now()
+				this.DeletedAt = time.Now()
+
+				err = m.Update(this)
+
+				if err != nil {
+					log.Error("Failed to mark as complete")
+					return
+				}
+
+				t.Scheduler.Remove(cron.EntryID(this.EntryID))
+			}
 		}
 	})
 
-	if t.Client != nil {
-		bt, err := json.Marshal(createdTask)
-		if err != nil {
-			return nil, err
-		}
+	if err != nil {
+		// Failed to set job
+		return nil, err
+	}
 
-		err = t.Client.Set(createdTask.TaskID, bt, 0).Err()
+	createdTask.EntryID = entryId
 
-		if err != nil {
-			return nil, err
-		}
+	err = m.Update(createdTask)
+
+	if err != nil {
+		return nil, err
 	}
 
 	return createdTask, nil
 }
 
 func (t *TaskService) Find(id string) (*Task, error) {
-	var task Task
+	m := NewMongoService(t.DB)
+	task, err := m.FindOne(id)
 
-	if t.Client != nil {
-		value, err := t.Client.Get(id).Result()
-
-		if err != nil {
-			// Cannot find values for key
-			return nil, err
-		}
-
-		err = json.Unmarshal([]byte(value), &task)
-
-		if err != nil {
-			// log.Error("Failed to marshal data")
-			return nil, err
-		}
+	if err != nil {
+		return nil, err
 	}
 
-	return &task, nil
+	return task, nil
 }
 
-func (t *TaskService) Delete(id string) (bool, error) {
-	if t.Client != nil {
-		err := t.Client.Del(id).Err()
+func (t *TaskService) Disable(id string) error {
+	m := NewMongoService(t.DB)
+	task, err := m.FindOne(id)
 
-		if err != nil {
-			// Cannot find values for key
-			return false, err
-		}
+	if err != nil {
+		return err
 	}
 
-	return true, nil
+	task.Enabled = false
+	task.UpdatedAt = time.Now()
+
+	err = m.Update(task)
+
+	if err != nil {
+		return err
+	}
+
+	t.Scheduler.Remove(task.EntryID)
+
+	return nil
+}
+
+// Delete -
+func (t *TaskService) Delete(id string) error {
+	m := NewMongoService(t.DB)
+	task, err := m.FindOne(id)
+
+	if err != nil {
+		return err
+	}
+
+	err = m.Delete(id)
+
+	if err != nil {
+		return err
+	}
+
+	t.Scheduler.Remove(task.EntryID)
+
+	return nil
 }
 
 // NewInputTask - object to store all parameters for creating a new task
 type NewInputTask struct {
-	Name     string                 `json:"name"`
-	Args     map[string]interface{} `json:"args"`
-	Schedule string                 `json:"schedule"`
-	Executor string                 `json:"executor"`
+	Name         string                 `json:"name"`
+	Args         map[string]interface{} `json:"args"`
+	Schedule     string                 `json:"schedule"`
+	IsRepeatable bool                   `json:"isRepeatable"`
+	Executor     string                 `json:"executor"`
+	EntryID      cron.EntryID           `json:"entryId"`
 }
 
 // TaskSearchOptions -

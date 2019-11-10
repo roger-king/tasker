@@ -4,16 +4,11 @@ import (
 	"net/http"
 
 	"github.com/roger-king/tasker"
-	"github.com/roger-king/tasker/pkg"
 )
 
 func main() {
 	t := tasker.New(&tasker.TaskerConfig{
-		ConnectionType: "redis",
-		Details: &pkg.ConnectionDetails{
-			Host: "localhost:6379",
-			DB:   0,
-		},
+		MongoConnectionURL: "mongodb://appuser:appuser@localhost:27017/tasker?authSource=admin",
 	})
 	router := t.Start()
 

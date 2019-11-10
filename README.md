@@ -42,11 +42,16 @@ Tasker utilizes [`12 Factor App configs`](https://12factor.net/config). Tasker r
 
 Below are the availble of environment variables that Tasker looks for (note: prefixed with `TASKER_`):
 
-| ENV                |                                        Description                                         |
-| ------------------ | :----------------------------------------------------------------------------------------: |
-| TASKER_DB_TYPE     |        type of presistent data store for your scheduled tasks (e.g. redis or mongo)        |
-| TASKER_DB_HOST     |                            host address for your database type                             |
-| TASKER_DB_USER     |                       username used to authenticate against your db                        |
-| TASKER_DB_PASSWORD |                       password used to authenticate against your db                        |
-| TASKER_DB_PORT     | port your database is listening on (if not specified will use the default your desired db) |
-| TASKER_SCRIPT_ROOT |                        root directory where your scripts are stored                        |
+| ENV                          |                                        Description                                         |
+| ------------------           | :----------------------------------------------------------------------------------------: |
+| TASKER_DB_CONNECTION_URL     |                            mongo connection uri                                            |
+| TASKER_PLUGIN_DIR            |                        root direction where your compiled go plugins can be found          |
+
+## TODOS:
+
+- [ ] Replace Gorilla Router with native HTTP Router to remove the dependency
+- [ ] Setup versioning of cront tasks
+- [ ] Setup crob job ability (currently disables any job after it has ran)
+- [ ] Allow for plugin registry
+- [ ] Allow to pull plugins from github via tags and versioning schema
+- [ ] Allow for pluging in your own DB

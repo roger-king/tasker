@@ -1,78 +1,73 @@
 package tasker
 
 import (
-	"log"
+	"os"
 
-	"github.com/go-redis/redis"
 	"github.com/gorilla/mux"
-	"github.com/robfig/cron"
+	cron "github.com/robfig/cron/v3"
 	"github.com/roger-king/tasker/pkg"
-	db "upper.io/db.v3"
+	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 // Tasker -
 type Tasker struct {
-	Client    *redis.Client
-	DB        db.Database
+	DB        *mongo.Client
 	Scheduler *cron.Cron
 }
 
 type TaskerConfig struct {
-	ConnectionType pkg.ConnectionType     `required:"true"`
-	Details        *pkg.ConnectionDetails `required:"true"`
+	MongoConnectionURL string `required:"true"`
+}
+
+func init() {
+	// Log as JSON instead of the default ASCII formatter.
+	log.SetFormatter(&log.JSONFormatter{})
+
+	// Output to stdout instead of the default stderr
+	// Can be any io.Writer, see below for File example
+	log.SetOutput(os.Stdout)
+
+	// Only log the warning severity or above.
+	log.SetLevel(log.DebugLevel)
 }
 
 // New - Creates a new instance of tasker
 func New(tc *TaskerConfig) *Tasker {
-	var client *redis.Client
+	m, err := pkg.NewMongoConnection(tc.MongoConnectionURL)
 
-	switch tc.ConnectionType {
-	// case pkg.MONGO:
-	// 	m, err := pkg.NewMongoConnection()
-
-	// 	if err != nil {
-	// 		log.Panic(err)
-	// 	}
-	// 	t.TaskService.DB = m
-	// 	break
-	case pkg.REDIS:
-		r, err := pkg.NewRedisConnection(tc.Details)
-
-		if err != nil {
-			log.Panic(err)
-		}
-		client = r
-		break
-	default:
-		// The default connection type will be redis
-		log.Panic("Please provide a valid connection type")
-		break
+	if err != nil {
+		log.Panic(err)
 	}
 
 	return &Tasker{
 		Scheduler: cron.New(),
-		Client:    client,
+		DB:        m,
 	}
 }
 
 // Start - returns a mux router instance
 func (t *Tasker) Start() *mux.Router {
-	log.Println("Starting tasker")
+	log.Info("Starting Tasker application")
 	t.Scheduler.Start()
+
 	taskService := &pkg.TaskService{
-		Client:    t.Client,
 		DB:        t.DB,
 		Scheduler: t.Scheduler,
 	}
 
 	r := mux.NewRouter()
-	apiRouter := r.PathPrefix("/api").Subrouter()
+	apiRouter := r.PathPrefix("/tasker").Subrouter()
 	apiRouter.HandleFunc("/tasks", pkg.ListTasks(taskService)).Methods("GET")
 	apiRouter.HandleFunc("/tasks", pkg.CreateTask(taskService)).Methods("POST")
 
 	// Single Task Routes
 	apiRouter.HandleFunc("/tasks/{taskID}", pkg.FindTask(taskService)).Methods("GET")
-	// apiRouter.HandleFunc("/tasks/{taskID}/disable", pkg.DisableTask(session)).Methods("PATCH")
+	apiRouter.HandleFunc("/tasks/{taskID}/disable", pkg.DisableTask(taskService)).Methods("PATCH")
 	apiRouter.HandleFunc("/tasks/{taskID}", pkg.DeleteTask(taskService)).Methods("DELETE")
+
+	// Web Admin - We have a reverse proxy for working on local developer :)
+	r.PathPrefix("/static/").HandlerFunc(pkg.ServeWebAdmin)
+	apiRouter.PathPrefix("/admin").HandlerFunc(pkg.ServeWebAdmin)
 	return r
 }
