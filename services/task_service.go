@@ -1,4 +1,4 @@
-package pkg
+package services
 
 import (
 	"fmt"
@@ -6,38 +6,10 @@ import (
 	"time"
 
 	cron "github.com/robfig/cron/v3"
+	"github.com/roger-king/tasker/models"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
-
-type ITask interface {
-	BeforeCreate()
-	Create(t *NewInputTask) (interface{}, error)
-	FindOne(taskId string) (Task, error)
-	List() ([]Task, error)
-	ListEnabledTasks(opts *TaskSearchOptions) ([]Task, error)
-	Delete(taskId string) error
-	Disable(taskId string) error
-}
-
-type Payload interface {
-	Run(args map[string]interface{}) error
-}
-
-type Task struct {
-	TaskID       string                 `json:"taskId" bson:"taskId"`
-	EntryID      cron.EntryID           `json:"entryId" bson:"entryId"`
-	Name         string                 `json:"name" bson:"name"`
-	Executor     string                 `json:"executor" bson:"executor"`
-	Schedule     string                 `json:"schedule" bson:"schedule"`
-	IsRepeatable bool                   `json:"isRepeatable" bson:"isRepeatable"`
-	Enabled      bool                   `json:"enabled" bson:"enabled"`
-	Complete     bool                   `json:"complete" bson:"complete"`
-	Args         map[string]interface{} `json:"args" bson:"args"`
-	CreatedAt    time.Time              `json:"createdAt" bson:"createdAt"`
-	UpdatedAt    time.Time              `json:"updatedAt" bson:"updatedAt"`
-	DeletedAt    time.Time              `json:"deletedAt" bson:"deletedAt"`
-}
 
 // TaskService - This is a wrapper around Tasker object
 type TaskService struct {
@@ -45,7 +17,7 @@ type TaskService struct {
 	Scheduler *cron.Cron
 }
 
-func (t *TaskService) List() ([]*Task, error) {
+func (t *TaskService) List() ([]*models.Task, error) {
 	m := NewMongoService(t.DB)
 
 	tasks, err := m.List()
@@ -57,7 +29,7 @@ func (t *TaskService) List() ([]*Task, error) {
 	return tasks, nil
 }
 
-func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
+func (t *TaskService) Create(i *models.NewInputTask) (*models.Task, error) {
 	m := NewMongoService(t.DB)
 	createdTask, err := m.Create(i)
 
@@ -128,7 +100,7 @@ func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
 	return createdTask, nil
 }
 
-func (t *TaskService) Find(id string) (*Task, error) {
+func (t *TaskService) Find(id string) (*models.Task, error) {
 	m := NewMongoService(t.DB)
 	task, err := m.FindOne(id)
 
