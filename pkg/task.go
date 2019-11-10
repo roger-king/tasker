@@ -31,7 +31,6 @@ type Task struct {
 	Executor     string                 `json:"executor" bson:"executor"`
 	Schedule     string                 `json:"schedule" bson:"schedule"`
 	IsRepeatable bool                   `json:"isRepeatable" bson:"isRepeatable"`
-	IsSet        bool                   `json:"isSet" bson:"isSet"`
 	Enabled      bool                   `json:"enabled" bson:"enabled"`
 	Complete     bool                   `json:"complete" bson:"complete"`
 	Args         map[string]interface{} `json:"args" bson:"args"`
@@ -101,7 +100,7 @@ func (t *TaskService) Create(i *NewInputTask) (*Task, error) {
 				this.UpdatedAt = time.Now()
 				this.DeletedAt = time.Now()
 
-				_, err = m.Update(createdTask)
+				_, err = m.Update(this)
 
 				if err != nil {
 					log.Error("Failed to mark as complete")

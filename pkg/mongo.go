@@ -6,14 +6,13 @@ import (
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // BeforeCreate - hook for creation
 func (t *Task) BeforeCreate() {
 	t.TaskID = uuid.New().String()
-	t.IsSet = true
 	t.Enabled = true
 	t.Complete = false
 	t.CreatedAt = time.Now()
@@ -97,19 +96,42 @@ func (m *MongoService) Create(newTask *NewInputTask) (*Task, error) {
 
 // Update -
 func (m *MongoService) Update(updatedTask *Task) (*Task, error) {
-	var task Task
+	var task *Task
+	var docUpdatedTask bson.M
+	// var updateDoc bson.DocElem
 	updatedTask.UpdatedAt = time.Now()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	err := m.Collection.FindOneAndUpdate(ctx, bson.M{"taskId": updatedTask.TaskID}, updatedTask).Decode(&task)
+
+	bUpdatedTask, err := bson.Marshal(updatedTask)
+
+	if err != nil {
+		return nil, err
+	}
+
+	err = bson.Unmarshal(bUpdatedTask, &docUpdatedTask)
+
+	if err != nil {
+		log.Error("Logging error")
+		return nil, err
+	}
+
+	update := bson.D{
+		{
+			"$set",
+			docUpdatedTask,
+		},
+	}
+
+	err = m.Collection.FindOneAndUpdate(ctx, bson.M{"taskId": updatedTask.TaskID}, update).Decode(&task)
 
 	if err != nil {
 		log.Info("Not working")
 		return nil, err
 	}
 
-	return &task, nil
+	return task, nil
 }
 
 // FindOne -
