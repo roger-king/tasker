@@ -1,36 +1,108 @@
 {
-  "name": "tasker-admin",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@types/jest": "24.0.22",
-    "@types/node": "12.12.7",
-    "@types/react": "16.9.11",
-    "@types/react-dom": "16.9.4",
-    "react": "^16.11.0",
-    "react-dom": "^16.11.0",
-    "react-scripts": "3.2.0",
-    "typescript": "3.7.2"
-  },
-  "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  }
+    "name": "tasker-admin",
+    "version": "0.1.0",
+    "private": true,
+    "dependencies": {
+        "@types/jest": "24.0.22",
+        "@types/node": "12.12.7",
+        "@types/react": "16.9.11",
+        "@types/react-dom": "16.9.4",
+        "grommet": "^2.8.0",
+        "grommet-icons": "^4.4.0",
+        "react": "^16.11.0",
+        "react-dom": "^16.11.0",
+        "react-scripts": "3.2.0",
+        "styled-components": "^4.4.1",
+        "typescript": "3.7.2"
+    },
+    "scripts": {
+        "lint": "eslint src --ext .ts,.tsx",
+        "lint:fix": "eslint src --fix --ext .ts,.tsx",
+        "typecheck": "tsc -p ./tsconfig.json",
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test",
+        "eject": "react-scripts eject",
+        "cypress": "cypress open",
+        "cypress:all": "cypress run"
+    },
+    "eslintConfig": {
+        "parser": "@typescript-eslint/parser",
+        "extends": [
+            "react-app",
+            "plugin:react/recommended",
+            "plugin:@typescript-eslint/recommended",
+            "airbnb-typescript",
+            "prettier/@typescript-eslint",
+            "prettier/react",
+            "plugin:prettier/recommended"
+        ],
+        "plugins": [
+            "prettier"
+        ],
+        "parserOptions": {
+            "ecmaVersion": 2018,
+            "sourceType": "module",
+            "ecmaFeatures": {
+                "jsx": true
+            }
+        },
+        "rules": {
+            "prettier/prettier": "error",
+            "import/prefer-default-export": 0,
+            "no-console": "off",
+            "class-methods-use-this": 0,
+            "@typescript-eslint/no-explicit-any": 0,
+            "no-shadow": 0,
+            "prefer-destructuring": 0,
+            "no-restricted-syntax": [
+                "error",
+                {
+                    "selector": "CallExpression[callee.object.name='console'][callee.property.name!=/^(log|warn|error|info|trace)$/]",
+                    "message": "Unexpected property on console object was called"
+                }
+            ]
+        },
+        "settings": {
+            "react": {
+                "version": "detect"
+            }
+        }
+    },
+    "husky": {
+        "hooks": {
+            "pre-commit": "lint-staged"
+        }
+    },
+    "lint-staged": {
+        "src/**/*.{ts,tsx}": [
+            "npm run --silent lint:fix",
+            "git add"
+        ]
+    },
+    "browserslist": {
+        "production": [
+            ">0.2%",
+            "not dead",
+            "not op_mini all"
+        ],
+        "development": [
+            "last 1 chrome version",
+            "last 1 firefox version",
+            "last 1 safari version"
+        ]
+    },
+    "devDependencies": {
+        "@types/styled-components": "^4.4.0",
+        "cypress": "^3.6.1",
+        "eslint-config-airbnb-typescript": "^6.1.0",
+        "eslint-config-prettier": "^6.5.0",
+        "eslint-config-react-app": "^5.0.2",
+        "eslint-plugin-import": "^2.18.2",
+        "eslint-plugin-jsx-a11y": "^6.2.3",
+        "eslint-plugin-prettier": "^3.1.1",
+        "husky": "^3.0.9",
+        "lint-staged": "^9.4.2",
+        "prettier": "^1.19.1"
+    }
 }
