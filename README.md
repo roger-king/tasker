@@ -34,7 +34,7 @@ Tasker is simple to get started. Tasker has 2 goals at mind:
 	http.ListenAndServe(":8080", nil)
 ```
 
-Go to your server and find the tasker web client at `/tasker`.
+Go to your server and find the tasker web client at `/tasker/admin`.
 
 ## Configuration of your server
 
