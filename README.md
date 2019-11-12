@@ -1,4 +1,4 @@
-# Tasker - [ DEVELOPEMENT IN PROGRESS ]
+# Tasker - [ DEVELOPMENT IN PROGRESS ]
 
 Tasker is a job scheduling service that utilizes `go-cron`. Tasker is a service that will allow for dynamic configration of tasks.
 
