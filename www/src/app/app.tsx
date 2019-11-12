@@ -19,7 +19,7 @@ const App: React.FC = () => {
             >
                 <Router>
                     <Header gridArea="header" />
-                    <Box gridArea="main" fill overflow="auto" margin="xlarge">
+                    <Box gridArea="main" fill>
                         <RouterContainer />
                     </Box>
                 </Router>

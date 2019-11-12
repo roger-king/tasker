@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Button, CheckBox, Heading, Text } from 'grommet';
+import { Box, Button, DropButton, CheckBox, Heading, Text } from 'grommet';
 import { MoreVertical } from 'grommet-icons';
 
 interface TaskProps {
@@ -34,7 +34,17 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
             <Text>
                 <i>{completeText}</i>
             </Text>
-            <Button icon={<MoreVertical size="medium" />} />
+            <DropButton
+                icon={<MoreVertical size="medium" />}
+                dropContent={
+                    <Box align="start" width="120px" gap="small" pad="small">
+                        <Button plain label="View" style={{ width: '100%' }} />
+                        <Button plain label="Edit" style={{ width: '100%' }} />
+                        <Button plain label="Delete" style={{ width: '100%' }} />
+                    </Box>
+                }
+                dropAlign={{ top: 'bottom' }}
+            />
         </Box>
     );
 };

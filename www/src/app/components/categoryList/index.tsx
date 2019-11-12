@@ -12,7 +12,7 @@ const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps) => 
     const { className, categories } = props;
 
     return (
-        <Box className={className} direction="column" width="150px">
+        <Box className={className} direction="column" width="200px">
             <Button icon={<Add size="small" />} label="Add" primary />
             <Heading level="4" margin="small">
                 All topics

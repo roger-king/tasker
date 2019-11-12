@@ -1,5 +1,5 @@
 import React from 'react';
-import { Box } from 'grommet';
+import { Box, Select } from 'grommet';
 import styled from 'styled-components';
 
 import CategoryList from '../components/categoryList';
@@ -12,9 +12,9 @@ interface HomePageProps {
 const HomePage: React.FC<HomePageProps> = (props: HomePageProps): JSX.Element => {
     const { className } = props;
     return (
-        <Box className={className} direction="row">
+        <Box className={className} direction="row" gap="large" justify="between" fill pad="xlarge">
             <CategoryList categories={['main', 'create', 'delete']} />
-            <Box align="start" width="80%" pad={{ left: '200px', right: '200px' }}>
+            <Box align="center" pad={{ left: '70px' }} width="100%">
                 <TaskList
                     header="main"
                     tasks={[
@@ -34,6 +34,10 @@ const HomePage: React.FC<HomePageProps> = (props: HomePageProps): JSX.Element =>
                         },
                     ]}
                 />
+            </Box>
+            <Box direction="row" align="start" justify="center" gap="small">
+                <Select options={['Last 7 days']} size="small" value="Last 7 days" />
+                <Select options={['All', 'main']} size="small" value="All" />
             </Box>
         </Box>
     );
