@@ -4,6 +4,8 @@ Tasker is a job scheduling service that utilizes `go-cron`. Tasker is a service 
 
 Tasker is inspired by the Android application `tasker` the ability to set scripts and schedule them at whim without needing to touch the server code.
 
+<img src="./static/wip_ui.png" width="600px">
+
 # Installation
 
 Import tasker:
