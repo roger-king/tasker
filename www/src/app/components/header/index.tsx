@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Box, Heading, TextInput, DropButton } from 'grommet';
-import { User } from 'grommet-icons';
+import { Box, Button, DropButton, Heading, TextInput } from 'grommet';
+import { User, Notification, Configure } from 'grommet-icons';
 
 interface HeaderProps {
     className?: string;
@@ -19,14 +19,22 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
             <Box
                 background="brand"
                 align="center"
-                justify="center"
+                justify="between"
                 direction="row"
                 width="100%"
                 height="100%"
                 pad="small"
             >
-                <TextInput height="50px" style={{ width: '300px' }} />
-                <DropButton icon={<User />} dropContent={<Box />} alignSelf="end" />
+                <Box direction="row" gap="medium">
+                    <Button>Overview</Button>
+                    <Button>Tasks</Button>
+                </Box>
+                <Box direction="row" alignSelf="end" align="center">
+                    <TextInput height="50px" style={{ width: '300px' }} />
+                    <DropButton icon={<Configure />} dropContent={<Box />} />
+                    <DropButton icon={<Notification />} dropContent={<Box />} />
+                    <DropButton icon={<User />} dropContent={<Box />} />
+                </Box>
             </Box>
         </Box>
     );
