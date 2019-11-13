@@ -2,6 +2,7 @@ interface Task {
     taskId: string;
     entryId: number;
     name: string;
+    description: string;
     executor: string;
     schedule: string;
     isRepeatable: boolean;
