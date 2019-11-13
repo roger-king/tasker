@@ -37,10 +37,10 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
             <DropButton
                 icon={<MoreVertical size="medium" />}
                 dropContent={
-                    <Box align="start" width="120px" gap="small" pad="small">
-                        <Button plain label="View" style={{ width: '100%' }} />
-                        <Button plain label="Edit" style={{ width: '100%' }} />
-                        <Button plain label="Delete" style={{ width: '100%' }} />
+                    <Box align="start" width="120px" gap="small">
+                        <Button plain label="View" style={{ width: '100%', padding: '10px' }} hoverIndicator />
+                        <Button plain label="Edit" style={{ width: '100%', padding: '10px' }} hoverIndicator />
+                        <Button plain label="Delete" style={{ width: '100%', padding: '10px' }} hoverIndicator />
                     </Box>
                 }
                 dropAlign={{ top: 'bottom' }}
