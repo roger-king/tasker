@@ -23,7 +23,7 @@
         "typecheck": "tsc -p ./tsconfig.json",
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test",
+        "test": "react-scripts test --silent",
         "eject": "react-scripts eject",
         "cypress": "cypress open",
         "cypress:all": "cypress run"
