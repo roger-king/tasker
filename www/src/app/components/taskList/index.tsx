@@ -7,6 +7,7 @@ interface TaskListProps {
     className?: string;
     tasks: Task[];
     categories: string[];
+    currentCategory: string | null;
 }
 
 interface TaskListData {
@@ -14,7 +15,7 @@ interface TaskListData {
 }
 
 const TaskList: React.FC<TaskListProps> = (props: TaskListProps): JSX.Element => {
-    const { className, tasks, categories } = props;
+    const { className, tasks, categories, currentCategory } = props;
 
     return (
         <Box className={className} gap="small" fill>
@@ -22,16 +23,26 @@ const TaskList: React.FC<TaskListProps> = (props: TaskListProps): JSX.Element =>
                 (c: string): JSX.Element => {
                     return (
                         <Box key={c} gap="small">
-                            <Box border="bottom" width="100%">
-                                <Heading level="3" margin="xsmall">
-                                    {c}.
-                                </Heading>
-                            </Box>
+                            {currentCategory && currentCategory === c ? (
+                                <Box border="bottom" width="100%">
+                                    <Heading level="3" margin="xsmall">
+                                        {currentCategory}.
+                                    </Heading>
+                                </Box>
+                            ) : (
+                                <Box border="bottom" width="100%">
+                                    <Heading level="3" margin="xsmall">
+                                        {c}.
+                                    </Heading>
+                                </Box>
+                            )}
+
                             {tasks.map((t: Task): JSX.Element | null => {
                                 if (t.executor === c) {
                                     return (
                                         <Task
                                             key={t.taskId}
+                                            id={t.taskId}
                                             name={t.name}
                                             description={t.description}
                                             enabled={t.enabled}

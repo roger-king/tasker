@@ -13,7 +13,7 @@ const ArgsField: React.FC<{}> = (): JSX.Element => {
 
 const ArgsFieldList: React.FC<{}> = () => {
     const [fields, setFields] = useState<number[]>([1]);
-    const newRow = () => {
+    const newRow = (): void => {
         setFields([...fields, fields.length + 1]);
     };
 
@@ -44,10 +44,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     const [next, setNext] = useState<boolean>(false);
 
     return (
-        <Layer modal onClickOutside={() => showModal()} onEsc={() => showModal()}>
+        <Layer modal onClickOutside={(): void => showModal()} onEsc={(): void => showModal()}>
             <Box width="medium" pad="medium">
                 <Box direction="row">
-                    <Button icon={<Close size="medium" />} onClick={() => showModal()} />
+                    <Button icon={<Close size="medium" />} onClick={(): void => showModal()} />
                     <Heading level="4">Create Task</Heading>
                 </Box>
                 <Form>
@@ -57,7 +57,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                             <FormField label="Description" />
                             <FormField label="Schedule" />
                             <FormField label="Executor" />
-                            <Button label="Next" onClick={() => setNext(true)} />
+                            <Button label="Next" onClick={(): void => setNext(true)} />
                         </Box>
                     ) : (
                         <Box>

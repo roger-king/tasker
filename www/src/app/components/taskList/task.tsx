@@ -2,9 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import { Box, Button, DropButton, CheckBox, Heading, Text } from 'grommet';
 import { MoreVertical } from 'grommet-icons';
+import { useHistory } from 'react-router';
 
 interface TaskProps {
     className?: string;
+    id: string;
     name: string;
     description: string;
     enabled: boolean;
@@ -12,8 +14,9 @@ interface TaskProps {
     runTime: string;
 }
 const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
-    const { className, name, description, enabled, complete } = props;
+    const { className, name, description, enabled, complete, id } = props;
     const completeText = complete ? 'Completed' : 'Not Complete';
+    const history = useHistory();
     return (
         <Box
             className={className}
@@ -42,8 +45,13 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
                     icon={<MoreVertical size="medium" />}
                     dropContent={
                         <Box align="start" width="120px" gap="small">
-                            <Button plain label="View" style={{ width: '100%', padding: '10px' }} hoverIndicator />
-                            <Button plain label="Edit" style={{ width: '100%', padding: '10px' }} hoverIndicator />
+                            <Button
+                                plain
+                                label="View"
+                                style={{ width: '100%', padding: '10px' }}
+                                hoverIndicator
+                                onClick={(): void => history.push(`/tasker/admin/task/${id}`)}
+                            />
                             <Button plain label="Delete" style={{ width: '100%', padding: '10px' }} hoverIndicator />
                         </Box>
                     }

@@ -61,7 +61,7 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
         this.setState({ currentCategory: c, filteredTasks: currTasks });
     };
 
-    setShowModal = () => {
+    setShowModal = (): void => {
         const { showModal } = this.state;
         this.setState({ showModal: !showModal });
     };
@@ -81,12 +81,27 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
                     {tasks.length === 0 ? (
                         'loading...'
                     ) : (
-                        <TaskList tasks={filteredTasks.length === 0 ? tasks : filteredTasks} categories={categories} />
+                        <TaskList
+                            tasks={filteredTasks.length === 0 ? tasks : filteredTasks}
+                            categories={categories}
+                            currentCategory={currentCategory}
+                        />
                     )}
                 </Box>
                 <Box direction="row" align="start" justify="center" gap="small">
                     <Select options={['Last 7 days']} size="small" value="Last 7 days" />
-                    <Select options={['All', 'main']} size="small" value="All" />
+                    <Select
+                        options={['All', ...categories]}
+                        size="small"
+                        value="All"
+                        onChange={({ option }): void => {
+                            if (option === 'All') {
+                                this.setCurrentCategory(null);
+                            } else {
+                                this.setCurrentCategory(option);
+                            }
+                        }}
+                    />
                 </Box>
                 {showModal && <CreateTaskModal showModal={this.setShowModal} />}
             </Box>
