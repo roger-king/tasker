@@ -14,7 +14,8 @@ interface HomePageProps {
 interface HomePageState {
     currentCategory: string | null;
     categories: string[];
-    tasks: any[];
+    tasks: Task[];
+    filteredTasks: Task[];
 }
 
 class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
@@ -25,22 +26,41 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
             currentCategory: null,
             categories: [],
             tasks: [],
+            filteredTasks: [],
         };
     }
 
     async componentDidMount(): Promise<void> {
         const tasks = await listTasks();
-        const categories = tasks.data.map((t: any) => t.executor);
+        const categories: string[] = [];
+
+        tasks.data.map((t: Task): void => {
+            if (categories.indexOf(t.executor) === -1) {
+                categories.push(t.executor);
+            }
+            // eslint-disable-next-line
+            return;
+        });
+
         this.setState({ categories, tasks: tasks.data });
     }
 
-    setCurrentCategory = (c: string): void => {
-        this.setState({ currentCategory: c });
+    setCurrentCategory = (c: string | null): void => {
+        const { tasks } = this.state;
+        let currTasks: any[] = [];
+
+        if (c === null) {
+            currTasks = [];
+        } else {
+            currTasks = tasks.filter((t: Task) => t.executor === c);
+        }
+
+        this.setState({ currentCategory: c, filteredTasks: currTasks });
     };
 
     render(): JSX.Element {
         const { className } = this.props;
-        const { currentCategory, categories, tasks } = this.state;
+        const { currentCategory, categories, tasks, filteredTasks } = this.state;
         return (
             <Box className={className} direction="row" gap="large" justify="between" fill pad="xlarge">
                 <CategoryList
@@ -49,7 +69,11 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
                     selectCategory={this.setCurrentCategory}
                 />
                 <Box align="center" pad={{ left: '70px' }} width="100%">
-                    {tasks.length === 0 ? 'loading...' : <TaskList header="main" tasks={tasks} />}
+                    {tasks.length === 0 ? (
+                        'loading...'
+                    ) : (
+                        <TaskList tasks={filteredTasks.length === 0 ? tasks : filteredTasks} />
+                    )}
                 </Box>
                 <Box direction="row" align="start" justify="center" gap="small">
                     <Select options={['Last 7 days']} size="small" value="Last 7 days" />

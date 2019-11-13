@@ -5,32 +5,35 @@ import Task from './task';
 
 interface TaskListProps {
     className?: string;
-    header: string;
-    tasks: any[];
+    tasks: Task[];
 }
 
 const TaskList: React.FC<TaskListProps> = (props: TaskListProps): JSX.Element => {
-    const { className, header, tasks } = props;
+    const { className, tasks } = props;
+    const headers: string[] = [];
 
     return (
         <Box className={className} fill>
-            <Box border="bottom" width="100%">
-                <Heading level="3" margin="xsmall">
-                    {header}.
-                </Heading>
-            </Box>
-            <Box margin="small" gap="small">
-                {tasks.map((t: any) => (
+            {tasks.map((t: Task) => (
+                <Box key={t.name} margin="small" gap="small">
+                    {headers.indexOf(t.executor) === -1 ? (
+                        <Box border="bottom" width="100%">
+                            <Heading level="3" margin="xsmall">
+                                {t.executor}.
+                            </Heading>
+                        </Box>
+                    ) : (
+                        ''
+                    )}
                     <Task
-                        key={t.name}
                         name={t.name}
                         description={t.description}
                         enabled={t.enabled}
                         complete={t.complete}
-                        runTime={t.runTime}
+                        runTime={t.schedule}
                     />
-                ))}
-            </Box>
+                </Box>
+            ))}
         </Box>
     );
 };
