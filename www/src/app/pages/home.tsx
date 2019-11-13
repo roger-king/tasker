@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 import CategoryList from '../components/categoryList';
 import TaskList from '../components/taskList';
+import CreateTaskModal from '../components/modals/createTask';
 
 import { listTasks } from '../data/tasker';
 
@@ -16,6 +17,7 @@ interface HomePageState {
     categories: string[];
     tasks: Task[];
     filteredTasks: Task[];
+    showModal: boolean;
 }
 
 class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
@@ -27,6 +29,7 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
             categories: [],
             tasks: [],
             filteredTasks: [],
+            showModal: false,
         };
     }
 
@@ -58,15 +61,21 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
         this.setState({ currentCategory: c, filteredTasks: currTasks });
     };
 
+    setShowModal = () => {
+        const { showModal } = this.state;
+        this.setState({ showModal: !showModal });
+    };
+
     render(): JSX.Element {
         const { className } = this.props;
-        const { currentCategory, categories, tasks, filteredTasks } = this.state;
+        const { currentCategory, categories, tasks, filteredTasks, showModal } = this.state;
         return (
             <Box className={className} direction="row" gap="large" justify="between" fill pad="xlarge">
                 <CategoryList
                     categories={categories}
                     current={currentCategory}
                     selectCategory={this.setCurrentCategory}
+                    openModal={this.setShowModal}
                 />
                 <Box align="center" pad={{ left: '70px' }} width="100%">
                     {tasks.length === 0 ? (
@@ -79,6 +88,7 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
                     <Select options={['Last 7 days']} size="small" value="Last 7 days" />
                     <Select options={['All', 'main']} size="small" value="All" />
                 </Box>
+                {showModal && <CreateTaskModal showModal={this.setShowModal} />}
             </Box>
         );
     }

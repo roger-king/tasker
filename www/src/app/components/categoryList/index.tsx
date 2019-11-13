@@ -8,15 +8,16 @@ interface CategoryListProps {
     categories: string[];
     current: string | null;
     selectCategory: any;
+    openModal: any;
 }
 
 const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps): JSX.Element => {
-    const { className, categories, current, selectCategory } = props;
+    const { className, categories, current, selectCategory, openModal } = props;
     const borderOpts = { side: 'left', size: '6px' };
 
     return (
         <Box className={className} direction="column" width="200px" gap="small">
-            <Button icon={<Add size="small" />} label="Add" primary />
+            <Button icon={<Add size="small" />} label="Add" primary onClick={() => openModal()} />
             <Box
                 style={{ cursor: 'pointer' }}
                 border={current === null ? borderOpts : null}
