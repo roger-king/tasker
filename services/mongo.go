@@ -94,6 +94,7 @@ func (m *MongoService) Create(newTask *models.NewInputTask) (*models.Task, error
 	task := &models.Task{
 		Name:         newTask.Name,
 		Schedule:     newTask.Schedule,
+		Description:  newTask.Description,
 		Executor:     newTask.Executor,
 		IsRepeatable: newTask.IsRepeatable,
 		Args:         newTask.Args,
