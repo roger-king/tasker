@@ -21,30 +21,36 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
             width="100vw"
             border
             align="center"
-            justify="between"
             pad={{ left: '60px' }}
             height="75px"
             gap="small"
         >
             <CheckBox disabled value="" checked={enabled} />
-            <Heading level="4" margin="small">
-                {name}
-            </Heading>
-            <Text wordBreak="break-all">{description}</Text>
-            <Text>
-                <i>{completeText}</i>
-            </Text>
-            <DropButton
-                icon={<MoreVertical size="medium" />}
-                dropContent={
-                    <Box align="start" width="120px" gap="small">
-                        <Button plain label="View" style={{ width: '100%', padding: '10px' }} hoverIndicator />
-                        <Button plain label="Edit" style={{ width: '100%', padding: '10px' }} hoverIndicator />
-                        <Button plain label="Delete" style={{ width: '100%', padding: '10px' }} hoverIndicator />
-                    </Box>
-                }
-                dropAlign={{ top: 'bottom' }}
-            />
+            <Box width="20%" align="start">
+                <Heading level="4" margin="small">
+                    {name}
+                </Heading>
+            </Box>
+            <Box width="50%" align="center">
+                <Text wordBreak="break-all">{description}</Text>
+            </Box>
+            <Box width="30%" justify="end" direction="row" align="center">
+                <Text>
+                    <i>{completeText}</i>
+                </Text>
+                <DropButton
+                    icon={<MoreVertical size="medium" />}
+                    dropContent={
+                        <Box align="start" width="120px" gap="small">
+                            <Button plain label="View" style={{ width: '100%', padding: '10px' }} hoverIndicator />
+                            <Button plain label="Edit" style={{ width: '100%', padding: '10px' }} hoverIndicator />
+                            <Button plain label="Delete" style={{ width: '100%', padding: '10px' }} hoverIndicator />
+                        </Box>
+                    }
+                    dropAlign={{ top: 'bottom' }}
+                    alignSelf="end"
+                />
+            </Box>
         </Box>
     );
 };
