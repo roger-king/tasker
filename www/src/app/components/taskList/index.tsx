@@ -25,8 +25,8 @@ const TaskList: React.FC<TaskListProps> = (props: TaskListProps): JSX.Element =>
                         key={t.name}
                         name={t.name}
                         description={t.description}
-                        isSet
-                        complete={false}
+                        enabled={t.enabled}
+                        complete={t.complete}
                         runTime={t.runTime}
                     />
                 ))}

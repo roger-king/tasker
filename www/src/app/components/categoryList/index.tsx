@@ -6,21 +6,41 @@ import styled from 'styled-components';
 interface CategoryListProps {
     className?: string;
     categories: string[];
+    current: string | null;
+    selectCategory: any;
 }
 
 const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps) => {
-    const { className, categories } = props;
+    const { className, categories, current, selectCategory } = props;
+    const borderOpts = { side: 'left', size: '6px' };
 
     return (
-        <Box className={className} direction="column" width="200px">
+        <Box className={className} direction="column" width="200px" gap="small">
             <Button icon={<Add size="small" />} label="Add" primary />
-            <Heading level="4" margin="small">
-                All topics
-            </Heading>
-            {categories.map((c: string) => (
-                <Heading level="4" margin="small">
-                    {c}
+            <Box
+                style={{ cursor: 'pointer' }}
+                border={current === null ? borderOpts : null}
+                onClick={() => {
+                    selectCategory(null);
+                }}
+            >
+                <Heading level="4" margin="xsmall">
+                    All topics
                 </Heading>
+            </Box>
+            {categories.map((c: string) => (
+                <Box
+                    key={c}
+                    style={{ cursor: 'pointer' }}
+                    border={current === c ? borderOpts : null}
+                    onClick={() => {
+                        selectCategory(c);
+                    }}
+                >
+                    <Heading level="4" margin="xsmall">
+                        {c}
+                    </Heading>
+                </Box>
             ))}
         </Box>
     );

@@ -7,17 +7,17 @@ interface TaskProps {
     className?: string;
     name: string;
     description: string;
-    isSet: boolean;
+    enabled: boolean;
     complete: boolean;
     runTime: string;
 }
 const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
-    const { className, name, description, isSet, complete } = props;
+    const { className, name, description, enabled, complete } = props;
     const completeText = complete ? 'Completed' : 'Not Complete';
     return (
         <Box
             className={className}
-            direction="row"
+            direction="row-responsive"
             width="100vw"
             border
             align="center"
@@ -26,11 +26,11 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
             height="75px"
             gap="small"
         >
-            <CheckBox disabled value="" checked={isSet} />
+            <CheckBox disabled value="" checked={enabled} />
             <Heading level="4" margin="small">
                 {name}
             </Heading>
-            <Text>{description}</Text>
+            <Text wordBreak="break-all">{description}</Text>
             <Text>
                 <i>{completeText}</i>
             </Text>

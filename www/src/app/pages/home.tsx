@@ -5,42 +5,59 @@ import styled from 'styled-components';
 import CategoryList from '../components/categoryList';
 import TaskList from '../components/taskList';
 
+import { listTasks } from '../data/tasker';
+
 interface HomePageProps {
     className?: string;
 }
 
-const HomePage: React.FC<HomePageProps> = (props: HomePageProps): JSX.Element => {
-    const { className } = props;
-    return (
-        <Box className={className} direction="row" gap="large" justify="between" fill pad="xlarge">
-            <CategoryList categories={['main', 'create', 'delete']} />
-            <Box align="center" pad={{ left: '70px' }} width="100%">
-                <TaskList
-                    header="main"
-                    tasks={[
-                        {
-                            name: 'test',
-                            description: 'a description of a test',
-                            set: true,
-                            complete: false,
-                            runTime: 'May 29, 2020',
-                        },
-                        {
-                            name: 'create application user',
-                            description: 'creating an application user for RDS instances',
-                            set: true,
-                            complete: false,
-                            runTime: 'May 29, 2020',
-                        },
-                    ]}
+interface HomePageState {
+    currentCategory: string | null;
+    categories: string[];
+    tasks: any[];
+}
+
+class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
+    constructor(props: HomePageProps) {
+        super(props);
+
+        this.state = {
+            currentCategory: null,
+            categories: [],
+            tasks: [],
+        };
+    }
+
+    async componentDidMount(): Promise<void> {
+        const tasks = await listTasks();
+        const categories = tasks.data.map((t: any) => t.executor);
+        this.setState({ categories, tasks: tasks.data });
+    }
+
+    setCurrentCategory = (c: string): void => {
+        this.setState({ currentCategory: c });
+    };
+
+    render(): JSX.Element {
+        const { className } = this.props;
+        const { currentCategory, categories, tasks } = this.state;
+        return (
+            <Box className={className} direction="row" gap="large" justify="between" fill pad="xlarge">
+                <CategoryList
+                    categories={categories}
+                    current={currentCategory}
+                    selectCategory={this.setCurrentCategory}
                 />
+                <Box align="center" pad={{ left: '70px' }} width="100%">
+                    {tasks.length === 0 ? 'loading...' : <TaskList header="main" tasks={tasks} />}
+                </Box>
+                <Box direction="row" align="start" justify="center" gap="small">
+                    <Select options={['Last 7 days']} size="small" value="Last 7 days" />
+                    <Select options={['All', 'main']} size="small" value="All" />
+                </Box>
             </Box>
-            <Box direction="row" align="start" justify="center" gap="small">
-                <Select options={['Last 7 days']} size="small" value="Last 7 days" />
-                <Select options={['All', 'main']} size="small" value="All" />
-            </Box>
-        </Box>
-    );
-};
+        );
+    }
+}
 
 export default styled(HomePage)``;
