@@ -72,7 +72,7 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
                     {tasks.length === 0 ? (
                         'loading...'
                     ) : (
-                        <TaskList tasks={filteredTasks.length === 0 ? tasks : filteredTasks} />
+                        <TaskList tasks={filteredTasks.length === 0 ? tasks : filteredTasks} categories={categories} />
                     )}
                 </Box>
                 <Box direction="row" align="start" justify="center" gap="small">

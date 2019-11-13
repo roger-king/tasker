@@ -10,7 +10,7 @@ interface CategoryListProps {
     selectCategory: any;
 }
 
-const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps) => {
+const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps): JSX.Element => {
     const { className, categories, current, selectCategory } = props;
     const borderOpts = { side: 'left', size: '6px' };
 
@@ -28,20 +28,22 @@ const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps) => 
                     All topics
                 </Heading>
             </Box>
-            {categories.map((c: string) => (
-                <Box
-                    key={c}
-                    style={{ cursor: 'pointer' }}
-                    border={current === c ? borderOpts : null}
-                    onClick={() => {
-                        selectCategory(c);
-                    }}
-                >
-                    <Heading level="4" margin="xsmall">
-                        {c}
-                    </Heading>
-                </Box>
-            ))}
+            {categories.map(
+                (c: string): JSX.Element => (
+                    <Box
+                        key={c}
+                        style={{ cursor: 'pointer' }}
+                        border={current === c ? borderOpts : null}
+                        onClick={() => {
+                            selectCategory(c);
+                        }}
+                    >
+                        <Heading level="4" margin="xsmall">
+                            {c}
+                        </Heading>
+                    </Box>
+                ),
+            )}
         </Box>
     );
 };
