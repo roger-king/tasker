@@ -10,6 +10,7 @@ import (
 // NewInputTask - object to store all parameters for creating a new task
 type NewInputTask struct {
 	Name         string                 `json:"name"`
+	Description  string                 `json:"description"`
 	Args         map[string]interface{} `json:"args"`
 	Schedule     string                 `json:"schedule"`
 	IsRepeatable bool                   `json:"isRepeatable"`
