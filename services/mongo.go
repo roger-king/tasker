@@ -52,7 +52,10 @@ func (m *MongoService) List() ([]*models.Task, error) {
 	var tasks []*models.Task
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
-	cur, err := m.Collection.Find(ctx, bson.M{})
+	options := options.Find()
+	options.SetSort(bson.D{{"executor", 1}})
+
+	cur, err := m.Collection.Find(ctx, bson.M{}, options)
 
 	if err != nil {
 		log.Info("This is dumb", err)
