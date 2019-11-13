@@ -6,8 +6,8 @@ const RouterContainer: React.FC<{}> = (): JSX.Element => {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <Switch>
-                <Route exact path="/" component={HomePage} />
-                <Redirect to="/" />
+                <Route exact path="/tasker/admin" component={HomePage} />
+                <Redirect to="/tasker/admin" />
             </Switch>
         </Suspense>
     );
