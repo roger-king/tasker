@@ -36,6 +36,7 @@ type Task struct {
 	TaskID       string                 `json:"taskId" bson:"taskId"`
 	EntryID      cron.EntryID           `json:"entryId" bson:"entryId"`
 	Name         string                 `json:"name" bson:"name"`
+	Description  string                 `json:"description" bson:"description"`
 	Executor     string                 `json:"executor" bson:"executor"`
 	Schedule     string                 `json:"schedule" bson:"schedule"`
 	IsRepeatable bool                   `json:"isRepeatable" bson:"isRepeatable"`
