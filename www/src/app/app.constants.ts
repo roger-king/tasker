@@ -13,7 +13,7 @@ export const theme: ThemeType = {
         colors: {
             background: '#1a1d21',
             brand: '#282c34',
-            'accent-1': '#9400D3',
+            'accent-1': '#139DDB',
             'accent-2': '#EF424C',
             'accent-3': '#F8F0EE',
             focus: 'accent-1',
