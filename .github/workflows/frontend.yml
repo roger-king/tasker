@@ -5,7 +5,7 @@ on:
       - *
 jobs:
   Test:
-    name: Unit Test
+    name: Admin Unit Tests
     runs-on: ubuntu-latest
     strategy:
       matrix:

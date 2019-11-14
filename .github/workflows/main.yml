@@ -5,7 +5,7 @@ on:
       - *
 jobs:
   Test:
-    name: Unit Test
+    name: API Unit Test
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.13
