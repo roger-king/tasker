@@ -1,3 +1,7 @@
+<p align="center">
+    <img src="./static/flash.png" width="200px">
+</p>
+
 # Tasker - [ DEVELOPMENT IN PROGRESS ]
 
 Tasker is a job scheduling service that utilizes `go-cron`. Tasker is a service that will allow for dynamic configration of tasks.
