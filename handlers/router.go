@@ -22,6 +22,7 @@ func NewRouter(taskService *services.TaskService) *mux.Router {
 
 	// Web Admin - We have a reverse proxy for working on local developer :)
 	r.PathPrefix("/static/").HandlerFunc(ServeWebAdmin)
+	r.PathPrefix("/images/").HandlerFunc(ServeWebAdmin)
 	apiRouter.PathPrefix("/admin").HandlerFunc(ServeWebAdmin)
 
 	return r
