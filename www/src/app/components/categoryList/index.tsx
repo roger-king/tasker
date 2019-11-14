@@ -19,6 +19,7 @@ const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps): JS
         <Box className={className} direction="column" width="200px" gap="small">
             <Button icon={<Add size="small" />} label="Add" primary onClick={(): void => openModal()} />
             <Box
+                id="category-all-menu-item"
                 style={{ cursor: 'pointer' }}
                 border={current === null ? borderOpts : null}
                 onClick={(): void => {
@@ -33,6 +34,7 @@ const CategoryList: React.FC<CategoryListProps> = (props: CategoryListProps): JS
                 (c: string): JSX.Element => (
                     <Box
                         key={c}
+                        id={`category-${c}-menu-item`}
                         style={{ cursor: 'pointer' }}
                         border={current === c ? borderOpts : null}
                         onClick={(): void => {
