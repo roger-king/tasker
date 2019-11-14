@@ -25,23 +25,23 @@ export const theme: ThemeType = {
     },
     heading: {
         font: {
-            family: 'Questrial, sans-serif',
+            family: 'Viga, sans-serif',
             size: '4em',
         },
         level: {
             2: {
                 font: {
-                    family: 'Questrial, sans-serif',
+                    family: 'Viga, sans-serif',
                 },
             },
             3: {
                 font: {
-                    family: 'Questrial, sans-serif',
+                    family: 'Viga, sans-serif',
                 },
             },
             4: {
                 font: {
-                    family: 'Questrial, sans-serif',
+                    family: 'Viga, sans-serif',
                 },
             },
         },
