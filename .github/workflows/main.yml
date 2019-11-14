@@ -1,8 +1,5 @@
 name: Backend
-on:
-  push:
-    branches:
-      - *
+on: [push]
 jobs:
   Test:
     name: API Unit Test

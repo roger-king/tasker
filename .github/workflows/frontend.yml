@@ -1,8 +1,5 @@
 name: Frontend
-on:
-  push:
-    branches:
-      - *
+on: [push]
 jobs:
   Test:
     name: Admin Unit Tests
