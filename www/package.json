@@ -23,7 +23,7 @@
         "typecheck": "tsc -p ./tsconfig.json",
         "start": "react-scripts start",
         "build": "react-scripts build",
-        "test": "react-scripts test --silent",
+        "test": "react-scripts test",
         "eject": "react-scripts eject",
         "cypress": "cypress open",
         "cypress:all": "cypress run"
@@ -95,11 +95,15 @@
         ]
     },
     "devDependencies": {
+        "@types/enzyme": "^3.10.3",
+        "@types/enzyme-adapter-react-16": "^1.0.5",
         "@types/react-router": "^5.1.2",
         "@types/react-router-dom": "^5.1.2",
         "@types/react-test-renderer": "^16.9.1",
         "@types/styled-components": "^4.4.0",
         "cypress": "^3.6.1",
+        "enzyme": "^3.10.0",
+        "enzyme-adapter-react-16": "^1.15.1",
         "eslint-config-airbnb-typescript": "^6.1.0",
         "eslint-config-prettier": "^6.5.0",
         "eslint-config-react-app": "^5.0.2",

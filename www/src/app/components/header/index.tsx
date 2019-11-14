@@ -47,10 +47,17 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                     <TextInput height="50px" style={{ width: '300px' }} />
                     <Button icon={<Configure />} onClick={(): void => history.push('/tasker/admin/settings')} />
                     <DropButton
+                        id="header-notification-btn"
                         icon={<Notification />}
                         dropAlign={{ top: 'bottom', right: 'left' }}
                         dropContent={
-                            <Box width="200px" height="200px" align="center" justify="center">
+                            <Box
+                                id="header-notification-drop-content"
+                                width="200px"
+                                height="200px"
+                                align="center"
+                                justify="center"
+                            >
                                 {notifcations.length > 0 ? (
                                     <Box> We have notifications! </Box>
                                 ) : (
