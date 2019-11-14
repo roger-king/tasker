@@ -11,7 +11,7 @@ exports[`<Header /> Matches the snapshot 1`] = `
     <h1
       className="StyledHeading-sc-1rdh4aw-0 rfVJR"
     >
-      Tasker
+      TASKER.
     </h1>
   </div>
   <div

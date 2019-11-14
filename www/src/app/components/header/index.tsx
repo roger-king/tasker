@@ -28,7 +28,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                 justify="center"
                 onClick={(): void => history.push('/tasker/admin')}
             >
-                <Heading level="1">Tasker</Heading>
+                <Heading level="1">TASKER.</Heading>
             </Box>
             <Box
                 background="brand"
