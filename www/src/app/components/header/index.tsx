@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Box, Button, DropButton, Heading, TextInput, Text } from 'grommet';
+import { Box, Button, DropButton, Heading, Image, TextInput, Text } from 'grommet';
 import { User, Notification, Configure } from 'grommet-icons';
 import { useHistory } from 'react-router';
 
@@ -27,8 +27,10 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                 align="center"
                 justify="center"
                 onClick={(): void => history.push('/tasker/admin')}
+                direction="row"
             >
-                <Heading level="1">TASKER.</Heading>
+                <Image src={`${process.env.PUBLIC_URL}/images/flash.png`} width="40px" />
+                <Heading level="2">TASKER.</Heading>
             </Box>
             <Box
                 background="brand"

@@ -1,5 +1,5 @@
 <p align="center">
-    <img src="./static/flash.png" width="200px">
+    <img src="./www/public/images/flash.png" width="200px">
 </p>
 
 # Tasker - [ DEVELOPMENT IN PROGRESS ]
