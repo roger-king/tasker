@@ -47,7 +47,7 @@ const DeleteTaskModal: React.FC<DeleteTaskModalProps> = (props: DeleteTaskModalP
                         <TextInput
                             placeholder="Enter the name of the task"
                             value={confirmedName}
-                            onChange={(e: any) => {
+                            onChange={(e: any): void => {
                                 setConfirmedName(e.target.value);
                                 if (e.target.value === taskName) {
                                     toggleCanDestroy(false);
@@ -62,7 +62,7 @@ const DeleteTaskModal: React.FC<DeleteTaskModalProps> = (props: DeleteTaskModalP
                             primary
                             label="Cancel"
                             style={{ borderRadius: '4px' }}
-                            onClick={() => showModal(false)}
+                            onClick={(): void => showModal(false)}
                             color="light-4"
                         />
                         <Button
@@ -71,7 +71,7 @@ const DeleteTaskModal: React.FC<DeleteTaskModalProps> = (props: DeleteTaskModalP
                             label="Destroy"
                             disabled={isDisabledDestroyBtn}
                             style={{ borderRadius: '4px' }}
-                            onClick={async () => {
+                            onClick={async (): Promise<void> => {
                                 await deleteTask(taskId);
                                 showModal(false);
                             }}
