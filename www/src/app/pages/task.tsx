@@ -6,6 +6,7 @@ import Parser from 'cron-parser';
 import { RouteComponentProps } from 'react-router';
 import PrettyJSON from '../components/prettyJSON';
 import { findTask } from '../data/tasker';
+import DisableModal from '../components/modals/disable';
 
 interface TaskPageProps extends RouteComponentProps {
     className?: string;
@@ -15,6 +16,7 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
     const { match } = props;
     const { params }: any = match;
     const [task, setTask] = useState<Task | null>(null);
+    const [showModal, setShowModal] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchTask = async (): Promise<void> => {
@@ -57,7 +59,6 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
                     </Box>
                     <PrettyJSON data={task.args} />
                 </Box>
-
                 <Box
                     flex={false}
                     height="100px"
@@ -70,8 +71,15 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
                     gap="medium"
                 >
                     <Text>{schedule}</Text>
-                    <Button primary color="brand" label="Disable" style={{ borderRadius: '8px' }} />
+                    <Button
+                        primary
+                        color="brand"
+                        label="Disable"
+                        style={{ borderRadius: '8px' }}
+                        onClick={(): void => setShowModal(true)}
+                    />
                 </Box>
+                {showModal && <DisableModal showModal={setShowModal} id={task.taskId} name={task.name} />}
             </Box>
         );
     }
