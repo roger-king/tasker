@@ -28,6 +28,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                 justify="center"
                 onClick={(): void => history.push('/tasker/admin')}
                 direction="row"
+                style={{ cursor: 'pointer' }}
             >
                 <Image src={`${process.env.PUBLIC_URL}/images/flash.png`} width="40px" />
                 <Heading level="2">TASKER.</Heading>

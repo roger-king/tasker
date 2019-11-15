@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Box, Button, DropButton, CheckBox, Heading, Text } from 'grommet';
 import { MoreVertical } from 'grommet-icons';
 import { useHistory } from 'react-router';
+import DeleteTaskModal from '../modals/delete';
 
 interface TaskProps {
     className?: string;
@@ -15,8 +16,10 @@ interface TaskProps {
 }
 const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
     const { className, name, description, enabled, complete, id } = props;
-    const completeText = complete ? 'Completed' : 'Not Complete';
+    const completeText = complete ? 'Completed' : 'Not Executed';
+    const [showModal, setShowModal] = useState<boolean>(false);
     const history = useHistory();
+
     return (
         <Box
             className={className}
@@ -52,13 +55,20 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
                                 hoverIndicator
                                 onClick={(): void => history.push(`/tasker/admin/task/${id}`)}
                             />
-                            <Button plain label="Delete" style={{ width: '100%', padding: '10px' }} hoverIndicator />
+                            <Button
+                                plain
+                                label="Delete"
+                                style={{ width: '100%', padding: '10px' }}
+                                hoverIndicator
+                                onClick={() => setShowModal(true)}
+                            />
                         </Box>
                     }
                     dropAlign={{ top: 'bottom' }}
                     alignSelf="end"
                 />
             </Box>
+            {showModal && <DeleteTaskModal showModal={setShowModal} taskName={name} taskId={id} />}
         </Box>
     );
 };

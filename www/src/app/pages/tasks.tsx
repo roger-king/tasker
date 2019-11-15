@@ -93,7 +93,7 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
                     <Select
                         options={['All', ...categories]}
                         size="small"
-                        value="All"
+                        value={currentCategory || 'All'}
                         onChange={({ option }): void => {
                             if (option === 'All') {
                                 this.setCurrentCategory(null);
