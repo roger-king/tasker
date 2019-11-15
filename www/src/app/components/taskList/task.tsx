@@ -60,7 +60,7 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
                                 label="Delete"
                                 style={{ width: '100%', padding: '10px' }}
                                 hoverIndicator
-                                onClick={() => setShowModal(true)}
+                                onClick={(): void => setShowModal(true)}
                             />
                         </Box>
                     }

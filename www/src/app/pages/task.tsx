@@ -4,6 +4,7 @@ import { Edit } from 'grommet-icons';
 import { DateTime } from 'luxon';
 import Parser from 'cron-parser';
 import { RouteComponentProps } from 'react-router';
+import PrettyJSON from '../components/prettyJSON';
 import { findTask } from '../data/tasker';
 
 interface TaskPageProps extends RouteComponentProps {
@@ -34,24 +35,26 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
 
         return (
             <Box align="start" gap="medium" fill>
-                <Box align="center" alignSelf="start" direction="row" gap="small" width="100%">
-                    <Box gap="small">
-                        <Heading level="2" margin="none">
-                            {task.name}
-                        </Heading>
-                        <Text size="16px">
-                            Created at <b>{formattedCreatedAt}</b>
+                <Box>
+                    <Box align="center" alignSelf="start" direction="row" gap="small" width="100%">
+                        <Box gap="small">
+                            <Heading level="2" margin="none">
+                                {task.name}
+                            </Heading>
+                            <Text size="16px">
+                                Created at <b>{formattedCreatedAt}</b>
+                            </Text>
+                        </Box>
+                        <Box direction="row" gap="small" align="center" alignSelf="start">
+                            <Button icon={<Edit size="small" />} label="Edit" style={{ borderRadius: '8px' }} />
+                        </Box>
+                    </Box>
+                    <Box margin="medium">
+                        <Text>
+                            <i>{task.description}</i>
                         </Text>
+                        <PrettyJSON data={task.args} />
                     </Box>
-                    <Box direction="row" gap="small" align="center" alignSelf="start">
-                        <Button icon={<Edit size="small" />} label="Edit" style={{ borderRadius: '8px' }} />
-                    </Box>
-                </Box>
-                <Box margin="medium">
-                    <Text>
-                        <i>{task.description}</i>
-                    </Text>
-                    <code>{JSON.stringify(task.args)}</code>
                 </Box>
                 <Box
                     flex={false}
