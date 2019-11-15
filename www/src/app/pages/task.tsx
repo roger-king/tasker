@@ -34,28 +34,30 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
             .toString();
 
         return (
-            <Box align="start" gap="medium" fill>
-                <Box>
-                    <Box align="center" alignSelf="start" direction="row" gap="small" width="100%">
+            <Box gap="medium" fill>
+                <Box margin={{ top: '80px', left: '100px', right: '100px' }} gap="medium">
+                    <Box align="center" direction="row" gap="small" width="100%" justify="between">
                         <Box gap="small">
-                            <Heading level="2" margin="none">
+                            <Heading level="2" margin="none" color="accent-1">
                                 {task.name}
                             </Heading>
+                            <Text>{task.description}</Text>
                             <Text size="16px">
-                                Created at <b>{formattedCreatedAt}</b>
+                                <i>
+                                    Created at <b>{formattedCreatedAt}</b>
+                                </i>
                             </Text>
                         </Box>
-                        <Box direction="row" gap="small" align="center" alignSelf="start">
-                            <Button icon={<Edit size="small" />} label="Edit" style={{ borderRadius: '8px' }} />
-                        </Box>
+                        <Button
+                            icon={<Edit size="small" />}
+                            label="Edit"
+                            style={{ borderRadius: '8px' }}
+                            alignSelf="start"
+                        />
                     </Box>
-                    <Box margin="medium">
-                        <Text>
-                            <i>{task.description}</i>
-                        </Text>
-                        <PrettyJSON data={task.args} />
-                    </Box>
+                    <PrettyJSON data={task.args} />
                 </Box>
+
                 <Box
                     flex={false}
                     height="100px"
