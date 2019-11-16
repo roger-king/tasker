@@ -9,7 +9,7 @@ import (
 	"github.com/roger-king/tasker/utils"
 )
 
-func NewRouter(taskService *services.TaskService) *mux.Router {
+func NewRouter(taskService *services.TaskService, github *services.GithubService) *mux.Router {
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/tasker").Subrouter()
 	apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
@@ -26,7 +26,7 @@ func NewRouter(taskService *services.TaskService) *mux.Router {
 	apiRouter.PathPrefix("/admin").HandlerFunc(ServeWebAdmin)
 
 	// authenticate route
-	r.PathPrefix("/authenticate/{code}").HandlerFunc(LoginHandler())
+	r.PathPrefix("/authenticate/{code}").HandlerFunc(LoginHandler(github))
 
 	return r
 }

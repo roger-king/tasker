@@ -25,6 +25,12 @@ var (
 
 	// TASKER_ENV -
 	TaskerEnv = os.Getenv("TASKER_ENV")
+
+	// GITHUB_CLIENT_ID
+	GithubClientID = os.Getenv("GITHUB_CLIENT_ID")
+
+	// GITHUB_CLIENT_SECRET
+	GithubClientSecret = os.Getenv("GITHUB_CLIENT_SECRET")
 )
 
 // HTTPError -
