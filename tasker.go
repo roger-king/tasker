@@ -4,6 +4,7 @@ import (
 	"os"
 
 	"github.com/gorilla/mux"
+	_ "github.com/joho/godotenv/autoload"
 	cron "github.com/robfig/cron/v3"
 	"github.com/roger-king/tasker/handlers"
 	"github.com/roger-king/tasker/services"
