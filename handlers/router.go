@@ -25,6 +25,9 @@ func NewRouter(taskService *services.TaskService) *mux.Router {
 	r.PathPrefix("/images/").HandlerFunc(ServeWebAdmin)
 	apiRouter.PathPrefix("/admin").HandlerFunc(ServeWebAdmin)
 
+	// authenticate route
+	r.PathPrefix("/authenticate/{code}").HandlerFunc(LoginHandler())
+
 	return r
 }
 
