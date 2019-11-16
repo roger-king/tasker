@@ -25,15 +25,23 @@ interface NewTaskInput {
     executor: string;
 }
 
-interface GithubOAuthLoginResponse {
+interface GithubOAuthLoginResponse extends GithhubOAuthhErrorResponse {
     access_token: string;
-    error: string;
-    error_description: string;
-    error_uri: string;
     scope: string;
     token_type: string;
 }
 
+interface GithubOAuthErrorResponse {
+    error: string;
+    error_description: string;
+    error_uri: string;
+}
+
 interface OAuthProviderClientIdResponse {
     client_id: string;
+}
+
+interface Response {
+    error?: string;
+    data: GithubOAuthLoginResponse | OAuthProviderClientIdResponse | Task | Task[];
 }

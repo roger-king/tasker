@@ -1,11 +1,13 @@
 import { defaultOAuthProvider } from '../app.constants';
 
-export const authenticate = async (code: string): Promise<GithubOAuthLoginResponse> => {
-    const data = await fetch(`/authenticate/${code}1`);
+export const authenticate = async (
+    code: string,
+): Promise<{ data: GithubOAuthLoginResponse | GithubOAuthErrorResponse; error?: string }> => {
+    const data = await fetch(`/oauth/authenticate/${code}`, { method: 'POST' });
     return data.json();
 };
 
-export const fetchClientId = async (scope: string): Promise<{ data: OAuthProviderClientIdResponse }> => {
+export const fetchUserClientId = async (): Promise<{ data: OAuthProviderClientIdResponse }> => {
     let uri = '/oauth';
     if (defaultOAuthProvider === 'github') {
         uri += '/github/';
@@ -13,6 +15,6 @@ export const fetchClientId = async (scope: string): Promise<{ data: OAuthProvide
         return { data: { client_id: '' } };
     }
 
-    const data = await fetch(`${uri}/${scope}`);
+    const data = await fetch(`${uri}/user`);
     return data.json();
 };

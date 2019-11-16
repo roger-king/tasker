@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import qs, { ParsedQuery } from 'query-string';
 import GithubOAuthLoginBtn from '../components/oauth/github';
 
-import { authenticate, fetchClientId } from '../data/auth';
+import { authenticate, fetchUserClientId } from '../data/auth';
 import { GITHUB_LOGIN_SCOPE, LOGIN_STATUS } from '../app.constants';
 
 const LoginPage: React.FC = () => {
@@ -23,19 +23,20 @@ const LoginPage: React.FC = () => {
                 setStatus(LOGIN_STATUS.LOADING);
 
                 const code = q.code;
-                authenticate(code as string).then((data: GithubOAuthLoginResponse) => {
-                    if (data.error.length > 0) {
+                authenticate(code as string).then((data: any) => {
+                    if (data.error && data.error.length > 0) {
                         setError(data.error_description);
                         setStatus(LOGIN_STATUS.ERROR);
                         return;
                     }
+
+                    console.log('DATA: ', data);
                     setStatus(LOGIN_STATUS.SUCCESS);
                 });
-                console.log('Getting github access token');
             }
         } else {
             // Fetch for client id
-            fetchClientId(GITHUB_LOGIN_SCOPE[0]).then(({ data }: { data: OAuthProviderClientIdResponse }) => {
+            fetchUserClientId().then(({ data }: { data: OAuthProviderClientIdResponse }) => {
                 if (data.client_id.length > 0) {
                     setClientId(data.client_id);
                 }
