@@ -26,17 +26,18 @@ func NewRouter(taskService *services.TaskService, github *services.GithubService
 	apiRouter.PathPrefix("/admin").HandlerFunc(ServeWebAdmin)
 
 	// authenticate route
+	// Public routes for github access
 	oauth := r.PathPrefix("/oauth").Subrouter()
 	oauth.HandleFunc("/authenticate/{code}", LoginHandler(github)).Methods("POST")
-	oauth.HandleFunc("/github/{scope}", FetchClientIDHandler(github)).Methods("GET")
+	oauth.HandleFunc("/github/user", FetchUserClientIDHandler(github)).Methods("GET")
 
 	return r
 }
 
 // Response Helpers:
 type errorHelper struct {
-	Error       string      `json:"error"`
-	Description interface{} `json:"description"`
+	Error string      `json:"error"`
+	Data  interface{} `json:"data"`
 }
 
 type dataHelper struct {
@@ -44,7 +45,7 @@ type dataHelper struct {
 }
 
 func respondWithError(w http.ResponseWriter, code int, errorType utils.HTTPError, message interface{}) {
-	response, _ := json.Marshal(&errorHelper{Error: errorType.String(), Description: message})
+	response, _ := json.Marshal(&errorHelper{Error: errorType.String(), Data: message})
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(code)

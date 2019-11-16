@@ -36,16 +36,9 @@ func LoginHandler(gh *services.GithubService) http.HandlerFunc {
 	}
 }
 
-func FetchClientIDHandler(gh *services.GithubService) http.HandlerFunc {
+func FetchUserClientIDHandler(gh *services.GithubService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		vars := mux.Vars(r)
-		scope := vars["scope"]
-
-		if len(scope) == 0 {
-			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, errors.New("no scope was supplied").Error())
-			return
-		}
-		id := gh.FetchClientID(utils.GithubScopeType(scope))
+		id := gh.FetchClientID(utils.GithubScopeType("user"))
 
 		if len(id.ClientID) <= 0 {
 			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, errors.New("cannot find github client id").Error())
