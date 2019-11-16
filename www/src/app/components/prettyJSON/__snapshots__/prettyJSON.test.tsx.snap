@@ -2,10 +2,19 @@
 
 exports[`<PrettyJSON /> Matches the snapshot 1`] = `
 <div
-  className="StyledBox-sc-13pk1d4-0 kDYwmu"
+  className="StyledBox-sc-13pk1d4-0 kDYwmu sc-bdVaJa dIhcOP"
 >
   <pre>
-    {"name":"Steve Rogers","email":"steve.rogers@avengers.com","friends":[{"name":"Tony Stark","alias":"Iron Man"}]}
+    {
+    "name": "Steve Rogers",
+    "email": "steve.rogers@avengers.com",
+    "friends": [
+        {
+            "name": "Tony Stark",
+            "alias": "Iron Man"
+        }
+    ]
+}
   </pre>
 </div>
 `;
