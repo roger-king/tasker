@@ -47,3 +47,16 @@ export const theme: ThemeType = {
         },
     },
 };
+
+// Default is a local testing client id
+export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID ? process.env.GITHUB_CLIENT_ID : '0ee66e6a8037e417d4b5';
+export const GITHUB_LOGIN_SCOPE = ['user'];
+
+export enum LOGIN_STATUS {
+    AUTHENTICATED,
+    UNAUTHENTICATED,
+    INITIAL,
+    LOADING,
+    ERROR,
+    SUCCESS,
+}
