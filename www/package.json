@@ -11,6 +11,7 @@
         "grommet": "^2.8.0",
         "grommet-icons": "^4.4.0",
         "luxon": "^1.21.1",
+        "query-string": "^6.9.0",
         "react": "^16.11.0",
         "react-dom": "^16.11.0",
         "react-router": "^5.1.2",
