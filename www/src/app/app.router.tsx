@@ -1,11 +1,12 @@
 import React, { Suspense } from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
-import { TasksPage, OverviewPage, SettingsPage, TaskPage } from './pages';
+import { TasksPage, OverviewPage, SettingsPage, TaskPage, LoginPage } from './pages';
 
 const RouterContainer: React.FC<{}> = (): JSX.Element => {
     return (
         <Suspense fallback={<div>Loading...</div>}>
             <Switch>
+                <Route exact path="/tasker/admin/login" component={LoginPage} />
                 <Route exact path="/tasker/admin" component={OverviewPage} />
                 <Route exact path="/tasker/admin/tasks" component={TasksPage} />
                 <Route exact path="/tasker/admin/settings" component={SettingsPage} />
