@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	resty "github.com/go-resty/resty/v2"
+	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/utils"
 )
 
@@ -12,12 +13,6 @@ type GithubService struct {
 	Req           *resty.Request
 	LoginTokenURL string
 	APIURL        string
-}
-
-type GithubAccessTokenBody struct {
-	ClientID     string `json:"client_id"`
-	ClientSecret string `json:"client_secret"`
-	Code         string `json:"code"`
 }
 
 // NewService - Creates an instance of UserService
@@ -35,8 +30,8 @@ func NewGithubService() *GithubService {
 	}
 }
 
-func (g *GithubService) GetAccessToken(code string) (*interface{}, error) {
-	var ghResponse interface{}
+func (g *GithubService) GetAccessToken(code string) (*models.GithubAccessTokenResponse, error) {
+	var ghResponse models.GithubAccessTokenResponse
 	url := fmt.Sprintf("%s/%s", g.LoginTokenURL, "oauth/access_token")
 
 	resp, err := g.Req.SetQueryParams(map[string]string{
@@ -56,4 +51,14 @@ func (g *GithubService) GetAccessToken(code string) (*interface{}, error) {
 	}
 
 	return &ghResponse, nil
+}
+
+func (g *GithubService) FetchClientID(scope utils.GithubScopeType) *models.GithubClientResponse {
+	if scope == utils.GithubUserScope {
+		return &models.GithubClientResponse{
+			ClientID: utils.GithubClientID,
+		}
+	}
+
+	return nil
 }

@@ -48,8 +48,13 @@ export const theme: ThemeType = {
     },
 };
 
+type GithubProvider = 'github';
+type OAuthProvider = GithubProvider;
 // Default is a local testing client id
-export const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID ? process.env.GITHUB_CLIENT_ID : 'f61c35c2c8450f7f78d5';
+export const defaultOAuthProvider: OAuthProvider = process.env.REACT_APP_OAUTH_PROVIDER
+    ? (process.env.REACT_APP_OAUTH_PROVIDER as OAuthProvider)
+    : 'github';
+
 export const GITHUB_LOGIN_SCOPE = ['user'];
 
 export enum LOGIN_STATUS {

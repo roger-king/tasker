@@ -7,7 +7,6 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
-	"github.com/sirupsen/logrus"
 )
 
 func LoginHandler(gh *services.GithubService) http.HandlerFunc {
@@ -23,12 +22,37 @@ func LoginHandler(gh *services.GithubService) http.HandlerFunc {
 		resp, err := gh.GetAccessToken(code)
 
 		if err != nil {
-			logrus.Info(err)
 			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
 			return
 		}
 
+		if len(resp.Error) > 0 {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, resp)
+			return
+		}
+
 		respondWithJSON(w, http.StatusOK, resp)
+		return
+	}
+}
+
+func FetchClientIDHandler(gh *services.GithubService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		scope := vars["scope"]
+
+		if len(scope) == 0 {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, errors.New("no scope was supplied").Error())
+			return
+		}
+		id := gh.FetchClientID(utils.GithubScopeType(scope))
+
+		if len(id.ClientID) <= 0 {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, errors.New("cannot find github client id").Error())
+			return
+		}
+
+		respondWithJSON(w, http.StatusOK, id)
 		return
 	}
 }

@@ -4,36 +4,59 @@ import { useLocation } from 'react-router-dom';
 import qs, { ParsedQuery } from 'query-string';
 import GithubOAuthLoginBtn from '../components/oauth/github';
 
-import { authenticate } from '../data/auth';
-import { GITHUB_CLIENT_ID, GITHUB_LOGIN_SCOPE, LOGIN_STATUS } from '../app.constants';
+import { authenticate, fetchClientId } from '../data/auth';
+import { GITHUB_LOGIN_SCOPE, LOGIN_STATUS } from '../app.constants';
 
 const LoginPage: React.FC = () => {
     const location = useLocation();
+    const [clientId, setClientId] = useState<string>('');
     const [status, setStatus] = useState<LOGIN_STATUS>(LOGIN_STATUS.INITIAL);
+    const [error, setError] = useState<string | null>(null);
+    const isDisabled = clientId.length === 0;
 
     useEffect(() => {
-        const queryString = location.search;
-        const q: ParsedQuery = qs.parse(queryString);
+        if (clientId.length > 0) {
+            const queryString = location.search;
+            const q: ParsedQuery = qs.parse(queryString);
 
-        if (q && q.code) {
-            setStatus(LOGIN_STATUS.LOADING);
+            if (q && q.code) {
+                setStatus(LOGIN_STATUS.LOADING);
 
-            const code = q.code;
-            authenticate(code as string).then((data: any) => {
-                console.log('authenticated', data);
-                setStatus(LOGIN_STATUS.SUCCESS);
+                const code = q.code;
+                authenticate(code as string).then((data: GithubOAuthLoginResponse) => {
+                    if (data.error.length > 0) {
+                        setError(data.error_description);
+                        setStatus(LOGIN_STATUS.ERROR);
+                        return;
+                    }
+                    setStatus(LOGIN_STATUS.SUCCESS);
+                });
+                console.log('Getting github access token');
+            }
+        } else {
+            // Fetch for client id
+            fetchClientId(GITHUB_LOGIN_SCOPE[0]).then(({ data }: { data: OAuthProviderClientIdResponse }) => {
+                if (data.client_id.length > 0) {
+                    setClientId(data.client_id);
+                }
             });
-            console.log('Getting github access token');
         }
-    }, [location.search]);
+    }, [clientId.length, location.search]);
 
     if (status === LOGIN_STATUS.LOADING) {
         return <Box>logging in...</Box>;
     }
 
+    if (status === LOGIN_STATUS.ERROR) {
+        if (error) {
+            return <Box>{error}</Box>;
+        }
+        return <Box>error occured</Box>;
+    }
+
     return (
         <Box>
-            <GithubOAuthLoginBtn clientId={GITHUB_CLIENT_ID} scope={GITHUB_LOGIN_SCOPE} />
+            <GithubOAuthLoginBtn clientId={clientId} scope={GITHUB_LOGIN_SCOPE} isDisabled={isDisabled} />
         </Box>
     );
 };

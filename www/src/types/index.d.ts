@@ -24,3 +24,16 @@ interface NewTaskInput {
     args: Record<string, any>;
     executor: string;
 }
+
+interface GithubOAuthLoginResponse {
+    access_token: string;
+    error: string;
+    error_description: string;
+    error_uri: string;
+    scope: string;
+    token_type: string;
+}
+
+interface OAuthProviderClientIdResponse {
+    client_id: string;
+}

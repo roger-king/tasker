@@ -46,3 +46,15 @@ const (
 	// RequestError -
 	RequestError HTTPError = "request_error"
 )
+
+// Github OAuth Tokens for different permissions
+
+// GithubScopeType -
+type GithubScopeType string
+
+const (
+	// GithubUserScope -
+	GithubUserScope GithubScopeType = "user"
+	// GithubRepoScope -
+	GithubRepoScope GithubScopeType = "repo"
+)

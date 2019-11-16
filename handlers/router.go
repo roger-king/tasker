@@ -26,22 +26,24 @@ func NewRouter(taskService *services.TaskService, github *services.GithubService
 	apiRouter.PathPrefix("/admin").HandlerFunc(ServeWebAdmin)
 
 	// authenticate route
-	r.PathPrefix("/authenticate/{code}").HandlerFunc(LoginHandler(github))
+	oauth := r.PathPrefix("/oauth").Subrouter()
+	oauth.HandleFunc("/authenticate/{code}", LoginHandler(github)).Methods("POST")
+	oauth.HandleFunc("/github/{scope}", FetchClientIDHandler(github)).Methods("GET")
 
 	return r
 }
 
 // Response Helpers:
 type errorHelper struct {
-	Error       string `json:"error"`
-	Description string `json:"description"`
+	Error       string      `json:"error"`
+	Description interface{} `json:"description"`
 }
 
 type dataHelper struct {
 	Data interface{} `json:"data"`
 }
 
-func respondWithError(w http.ResponseWriter, code int, errorType utils.HTTPError, message string) {
+func respondWithError(w http.ResponseWriter, code int, errorType utils.HTTPError, message interface{}) {
 	response, _ := json.Marshal(&errorHelper{Error: errorType.String(), Description: message})
 
 	w.Header().Set("Content-Type", "application/json")
