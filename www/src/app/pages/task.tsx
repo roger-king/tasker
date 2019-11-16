@@ -4,7 +4,9 @@ import { Edit } from 'grommet-icons';
 import { DateTime } from 'luxon';
 import Parser from 'cron-parser';
 import { RouteComponentProps } from 'react-router';
+
 import PrettyJSON from '../components/prettyJSON';
+import TaskTypeIcon from '../components/taskTypeIcon';
 import { findTask } from '../data/tasker';
 import DisableModal from '../components/modals/disable';
 
@@ -40,9 +42,12 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
                 <Box margin={{ top: '80px', left: '100px', right: '100px' }} gap="medium">
                     <Box align="center" direction="row" gap="small" width="100%" justify="between">
                         <Box gap="small">
-                            <Heading level="2" margin="none" color="accent-1">
-                                {task.name}
-                            </Heading>
+                            <Box direction="row" align="center" gap="small">
+                                <TaskTypeIcon repeat={task.isRepeatable} />
+                                <Heading level="2" margin="none" color="accent-1">
+                                    {task.name}
+                                </Heading>
+                            </Box>
                             <Text>{task.description}</Text>
                             <Text size="16px">
                                 <i>
@@ -57,7 +62,9 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
                             alignSelf="start"
                         />
                     </Box>
-                    <PrettyJSON data={task.args} />
+                    <Box align="center" width="100%">
+                        <PrettyJSON data={task.args} />
+                    </Box>
                 </Box>
                 <Box
                     flex={false}
