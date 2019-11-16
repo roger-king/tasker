@@ -31,6 +31,9 @@ var (
 
 	// GITHUB_CLIENT_SECRET
 	GithubClientSecret = os.Getenv("GITHUB_CLIENT_SECRET")
+
+	// TaskerSecret - used for our signing of tokens
+	TaskerSecret = os.Getenv("TASKER_SECRET")
 )
 
 // HTTPError -
