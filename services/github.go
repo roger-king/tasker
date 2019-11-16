@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	resty "github.com/go-resty/resty/v2"
-	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/utils"
 )
 
@@ -24,7 +23,9 @@ type GithubAccessTokenBody struct {
 // NewService - Creates an instance of UserService
 func NewGithubService() *GithubService {
 	client := resty.New()
-	req := client.R()
+	req := client.R().SetHeaders(map[string]string{
+		"Accept": "application/json",
+	})
 
 	return &GithubService{
 		Client:        client,
@@ -34,14 +35,14 @@ func NewGithubService() *GithubService {
 	}
 }
 
-func (g *GithubService) GetAccessToken(code string) (*models.GithubAccessTokenResponse, error) {
-	var ghResponse models.GithubAccessTokenResponse
+func (g *GithubService) GetAccessToken(code string) (*interface{}, error) {
+	var ghResponse interface{}
 	url := fmt.Sprintf("%s/%s", g.LoginTokenURL, "oauth/access_token")
 
-	resp, err := g.Req.SetBody(&GithubAccessTokenBody{
-		ClientID:     utils.GithubClientID,
-		ClientSecret: utils.GithubClientSecret,
-		Code:         code,
+	resp, err := g.Req.SetQueryParams(map[string]string{
+		"client_id":     utils.GithubClientID,
+		"client_secret": utils.GithubClientSecret,
+		"code":          code,
 	}).Post(url)
 
 	if err != nil {
