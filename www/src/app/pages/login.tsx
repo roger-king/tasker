@@ -6,6 +6,7 @@ import GithubOAuthLoginBtn from '../components/oauth/github';
 
 import { authenticate, fetchUserClientId, check } from '../data/auth';
 import { GITHUB_LOGIN_SCOPE, LOGIN_STATUS } from '../app.constants';
+import Logo from '../components/logo';
 
 const LoginPage: React.FC = () => {
     const location = useLocation();
@@ -65,7 +66,10 @@ const LoginPage: React.FC = () => {
     }
 
     return (
-        <Box>
+        <Box align="center" justify="center" fill>
+            <Box direction="row" align="center">
+                <Logo />
+            </Box>
             <GithubOAuthLoginBtn clientId={clientId} scope={GITHUB_LOGIN_SCOPE} isDisabled={isDisabled} />
         </Box>
     );
