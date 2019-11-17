@@ -57,7 +57,22 @@ func LoginHandler(gh *services.GithubAuthService, db *mongo.Client) http.Handler
 			return
 		}
 
-		respondWithJSON(w, http.StatusOK, createdUser)
+		token, expiresAt, err := services.GenerateJWTToken(createdUser)
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
+			return
+		}
+
+		http.SetCookie(w, &http.Cookie{
+			Name:     "tasker-user",
+			Value:    token,
+			Expires:  expiresAt,
+			HttpOnly: true,
+			Path:     "/",
+		})
+
+		respondWithJSON(w, http.StatusOK, "OK")
 		return
 	}
 }

@@ -12,6 +12,9 @@ import (
 
 func NewRouter(taskService *services.TaskService, github *services.GithubAuthService, db *mongo.Client) *mux.Router {
 	r := mux.NewRouter()
+
+	r.HandleFunc("/check", CheckSession()).Methods("GET")
+
 	apiRouter := r.PathPrefix("/tasker").Subrouter()
 	apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
 	apiRouter.HandleFunc("/tasks", CreateTask(taskService)).Methods("POST")
