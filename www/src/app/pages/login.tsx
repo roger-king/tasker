@@ -66,7 +66,7 @@ const LoginPage: React.FC = () => {
     }
 
     return (
-        <Box align="center" justify="center" fill>
+        <Box align="center" pad={{ top: '500px' }} fill>
             <Box direction="row" align="center">
                 <Logo />
             </Box>
