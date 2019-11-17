@@ -1,7 +1,10 @@
-import React, { Suspense } from 'react';
-import { Route, Switch, Redirect, RouteProps } from 'react-router-dom';
-import { TasksPage, OverviewPage, SettingsPage, TaskPage, LoginPage } from './pages';
+import React from 'react';
+import { Route, Redirect, RouteProps } from 'react-router-dom';
+import { Box, Grid } from 'grommet';
+import { TasksPage, OverviewPage, SettingsPage, TaskPage } from './pages';
 import { check } from './data/auth';
+
+import Header from './components/header';
 
 export interface ProtectedRouteProps extends RouteProps {
     authenticationPath: string;
@@ -40,10 +43,17 @@ const defaultProtectedRouteProps: ProtectedRouteProps = {
 
 const RouterContainer: React.FC<{}> = (): JSX.Element => {
     return (
-        <Suspense fallback={<div>Loading...</div>}>
-            <Switch>
-                <Route exact path="/tasker/admin/login" component={LoginPage} />
-                <ProtectedRoute {...defaultProtectedRouteProps} exact path="/tasker/admin" component={OverviewPage} />
+        <Grid
+            fill
+            rows={['auto', 'flex']}
+            columns={['auto', 'flex']}
+            areas={[
+                { name: 'header', start: [0, 0], end: [1, 0] },
+                { name: 'main', start: [1, 1], end: [1, 1] },
+            ]}
+        >
+            <Header gridArea="header" />
+            <Box gridArea="main" fill>
                 <ProtectedRoute {...defaultProtectedRouteProps} exact path="/tasker/admin" component={OverviewPage} />
                 <ProtectedRoute
                     {...defaultProtectedRouteProps}
@@ -63,9 +73,8 @@ const RouterContainer: React.FC<{}> = (): JSX.Element => {
                     path="/tasker/admin/task/:id"
                     component={TaskPage}
                 />
-                <Redirect to="/tasker/admin/login" />
-            </Switch>
-        </Suspense>
+            </Box>
+        </Grid>
     );
 };
 

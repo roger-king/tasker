@@ -1,29 +1,22 @@
-import React from 'react';
-import { Grommet, Grid, Box } from 'grommet';
-import { BrowserRouter as Router } from 'react-router-dom';
+import React, { Suspense } from 'react';
+import { Grommet } from 'grommet';
+import { BrowserRouter as Router, Switch, Route, Redirect } from 'react-router-dom';
+import { LoginPage } from './pages';
 import { theme } from './app.constants';
-import Header from './components/header';
 import RouterContainer from './app.router';
 
 const App: React.FC = () => {
     return (
         <Grommet theme={theme} full>
-            <Grid
-                fill
-                rows={['auto', 'flex']}
-                columns={['auto', 'flex']}
-                areas={[
-                    { name: 'header', start: [0, 0], end: [1, 0] },
-                    { name: 'main', start: [1, 1], end: [1, 1] },
-                ]}
-            >
-                <Router>
-                    <Header gridArea="header" />
-                    <Box gridArea="main" fill>
+            <Router>
+                <Suspense fallback={<div>Loading...</div>}>
+                    <Switch>
+                        <Route exact path="/tasker/admin/login" component={LoginPage} />
                         <RouterContainer />
-                    </Box>
-                </Router>
-            </Grid>
+                        <Redirect to="/tasker/admin/login" />
+                    </Switch>
+                </Suspense>
+            </Router>
         </Grommet>
     );
 };

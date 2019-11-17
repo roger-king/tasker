@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Box, Button, DropButton, Heading, Image, TextInput, Text } from 'grommet';
+import { Box, Button, DropButton, TextInput, Text } from 'grommet';
 import { User, Notification, Configure } from 'grommet-icons';
 import { useHistory } from 'react-router';
+import Logo from '../logo';
 
 interface HeaderProps {
     className?: string;
@@ -30,8 +31,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                 direction="row"
                 style={{ cursor: 'pointer' }}
             >
-                <Image src={`${process.env.PUBLIC_URL}/images/flash.png`} width="40px" />
-                <Heading level="2">TASKER.</Heading>
+                <Logo />
             </Box>
             <Box
                 background="brand"
