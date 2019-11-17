@@ -1,6 +1,14 @@
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 type Optionalize<T extends K, K> = Omit<T, keyof K>;
 
+interface User {
+    username: string;
+    name: string;
+    githubURL: string;
+    email: string;
+    bio: string;
+}
+
 interface Task {
     taskId: string;
     entryId: number;
@@ -25,6 +33,8 @@ interface NewTaskInput {
     executor: string;
 }
 
+type OK = 'OK';
+
 interface GithubOAuthLoginResponse extends GithhubOAuthhErrorResponse {
     access_token: string;
     scope: string;
@@ -43,5 +53,5 @@ interface OAuthProviderClientIdResponse {
 
 interface Response {
     error?: string;
-    data: GithubOAuthLoginResponse | OAuthProviderClientIdResponse | Task | Task[];
+    data: OK | GithubOAuthLoginResponse | OAuthProviderClientIdResponse | Task | Task[];
 }

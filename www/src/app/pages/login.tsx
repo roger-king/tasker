@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Box } from 'grommet';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useHistory } from 'react-router-dom';
 import qs, { ParsedQuery } from 'query-string';
 import GithubOAuthLoginBtn from '../components/oauth/github';
 
@@ -9,6 +9,7 @@ import { GITHUB_LOGIN_SCOPE, LOGIN_STATUS } from '../app.constants';
 
 const LoginPage: React.FC = () => {
     const location = useLocation();
+    const history = useHistory();
     const [clientId, setClientId] = useState<string>('');
     const [status, setStatus] = useState<LOGIN_STATUS>(LOGIN_STATUS.INITIAL);
     const [error, setError] = useState<string | null>(null);
@@ -30,8 +31,9 @@ const LoginPage: React.FC = () => {
                         return;
                     }
 
-                    console.log('DATA: ', data);
+                    // setCookie(data.data);
                     setStatus(LOGIN_STATUS.SUCCESS);
+                    history.push('/tasker/admin');
                 });
             }
         } else {
@@ -42,7 +44,7 @@ const LoginPage: React.FC = () => {
                 }
             });
         }
-    }, [clientId.length, location.search]);
+    }, [clientId.length, location.search, history]);
 
     if (status === LOGIN_STATUS.LOADING) {
         return <Box>logging in...</Box>;
