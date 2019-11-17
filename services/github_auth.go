@@ -8,7 +8,7 @@ import (
 	"github.com/roger-king/tasker/utils"
 )
 
-type GithubService struct {
+type GithubAuthService struct {
 	Client        *resty.Client
 	Req           *resty.Request
 	LoginTokenURL string
@@ -16,13 +16,13 @@ type GithubService struct {
 }
 
 // NewService - Creates an instance of UserService
-func NewGithubService() *GithubService {
+func NewGithubAuthService() *GithubAuthService {
 	client := resty.New()
 	req := client.R().SetHeaders(map[string]string{
 		"Accept": "application/json",
 	})
 
-	return &GithubService{
+	return &GithubAuthService{
 		Client:        client,
 		Req:           req,
 		LoginTokenURL: "https://github.com/login",
@@ -30,7 +30,7 @@ func NewGithubService() *GithubService {
 	}
 }
 
-func (g *GithubService) GetAccessToken(code string) (*models.GithubAccessTokenResponse, error) {
+func (g *GithubAuthService) GetAccessToken(code string) (*models.GithubAccessTokenResponse, error) {
 	var ghResponse models.GithubAccessTokenResponse
 	url := fmt.Sprintf("%s/%s", g.LoginTokenURL, "oauth/access_token")
 
@@ -53,7 +53,7 @@ func (g *GithubService) GetAccessToken(code string) (*models.GithubAccessTokenRe
 	return &ghResponse, nil
 }
 
-func (g *GithubService) FetchClientID(scope utils.GithubScopeType) *models.GithubClientResponse {
+func (g *GithubAuthService) FetchClientID(scope utils.GithubScopeType) *models.GithubClientResponse {
 	if scope == utils.GithubUserScope {
 		return &models.GithubClientResponse{
 			ClientID: utils.GithubClientID,

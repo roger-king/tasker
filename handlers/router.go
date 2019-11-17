@@ -7,9 +7,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func NewRouter(taskService *services.TaskService, github *services.GithubService) *mux.Router {
+func NewRouter(taskService *services.TaskService, github *services.GithubAuthService, db *mongo.Client) *mux.Router {
 	r := mux.NewRouter()
 	apiRouter := r.PathPrefix("/tasker").Subrouter()
 	apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
@@ -28,7 +29,7 @@ func NewRouter(taskService *services.TaskService, github *services.GithubService
 	// authenticate route
 	// Public routes for github access
 	oauth := r.PathPrefix("/oauth").Subrouter()
-	oauth.HandleFunc("/authenticate/{code}", LoginHandler(github)).Methods("POST")
+	oauth.HandleFunc("/authenticate/{code}", LoginHandler(github, db)).Methods("POST")
 	oauth.HandleFunc("/github/user", FetchUserClientIDHandler(github)).Methods("GET")
 
 	return r

@@ -5,7 +5,9 @@ import (
 	"time"
 
 	"github.com/roger-king/tasker/models"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // MongoService - a service to interact with a task
@@ -14,10 +16,15 @@ type UserService struct {
 }
 
 // NewUserService - initializes task service
-func NewUserService(db *mongo.Client) *MongoService {
+func NewUserService(db *mongo.Client) *UserService {
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
 	collection := db.Database("tasker").Collection("users")
+	collection.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.M{
+		"username": 1,
+	}, Options: options.Index().SetUnique(true)})
 
-	return &MongoService{
+	return &UserService{
 		Collection: collection,
 	}
 }
@@ -25,11 +32,15 @@ func NewUserService(db *mongo.Client) *MongoService {
 func (u *UserService) CreateUser(newUser *models.User) (*models.User, error) {
 	newUser.BeforeCreate()
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	_, err := u.Collection.InsertOne(ctx, newUser)
 	defer cancel()
 
-	if err != nil {
-		return nil, err
+	result := u.Collection.FindOneAndReplace(ctx, bson.M{"username": newUser.UserName}, newUser)
+	if result.Err() != nil {
+		_, err := u.Collection.InsertOne(ctx, newUser)
+
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	return newUser, nil

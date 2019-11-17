@@ -5,11 +5,13 @@ import (
 	"net/http"
 
 	"github.com/gorilla/mux"
+	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func LoginHandler(gh *services.GithubService) http.HandlerFunc {
+func LoginHandler(gh *services.GithubAuthService, db *mongo.Client) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		code := vars["code"]
@@ -31,12 +33,36 @@ func LoginHandler(gh *services.GithubService) http.HandlerFunc {
 			return
 		}
 
-		respondWithJSON(w, http.StatusOK, resp)
+		// Fetching for github user
+		api := services.NewGithubAPIService(resp.AccessToken)
+		user, err := api.GetUser()
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
+			return
+		}
+
+		userService := services.NewUserService(db)
+		createdUser, err := userService.CreateUser(&models.User{
+			Email:       user.GetEmail(),
+			UserName:    user.GetLogin(),
+			Name:        user.GetName(),
+			AccessToken: resp.AccessToken,
+			Bio:         user.GetBio(),
+			GitHubURL:   user.GetHTMLURL(),
+		})
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
+			return
+		}
+
+		respondWithJSON(w, http.StatusOK, createdUser)
 		return
 	}
 }
 
-func FetchUserClientIDHandler(gh *services.GithubService) http.HandlerFunc {
+func FetchUserClientIDHandler(gh *services.GithubAuthService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		id := gh.FetchClientID(utils.GithubScopeType("user"))
 
