@@ -8,7 +8,7 @@ import { RouteComponentProps } from 'react-router';
 import PrettyJSON from '../components/prettyJSON';
 import TaskTypeIcon from '../components/taskTypeIcon';
 import { findTask } from '../data/tasker';
-import DisableModal from '../components/modals/disable';
+import IsEnabledModal from '../components/modals/isEnabled';
 
 interface TaskPageProps extends RouteComponentProps {
     className?: string;
@@ -81,12 +81,14 @@ const TaskPage: React.FC<TaskPageProps> = (props: TaskPageProps): JSX.Element =>
                     <Button
                         primary
                         color="brand"
-                        label="Disable"
+                        label={task.enabled ? 'Disable' : 'Enable'}
                         style={{ borderRadius: '8px' }}
                         onClick={(): void => setShowModal(true)}
                     />
                 </Box>
-                {showModal && <DisableModal showModal={setShowModal} id={task.taskId} name={task.name} />}
+                {showModal && (
+                    <IsEnabledModal showModal={setShowModal} id={task.taskId} name={task.name} enabled={task.enabled} />
+                )}
             </Box>
         );
     }

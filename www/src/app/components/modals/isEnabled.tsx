@@ -1,26 +1,31 @@
 import React from 'react';
 import { Box, Button, Heading, Layer, Text } from 'grommet';
 import { Close } from 'grommet-icons';
+import { capitalize } from '../../utils/case';
 
-interface DisableModalProps {
+import { disableTask } from '../../data/tasker';
+
+interface IsEnabledModalProps {
     showModal: any;
     id: string;
     name: string;
+    enabled: boolean;
 }
 
-const DisableModal: React.FC<DisableModalProps> = (props: DisableModalProps): JSX.Element => {
-    const { showModal, name } = props;
+const IsEnabledModal: React.FC<IsEnabledModalProps> = (props: IsEnabledModalProps): JSX.Element => {
+    const { showModal, name, id, enabled } = props;
+    const header = enabled ? 'disable' : 'enable';
 
     return (
         <Layer modal onClickOutside={(): void => showModal(false)} onEsc={(): void => showModal(false)}>
             <Box width="medium" pad="medium">
                 <Box direction="row">
                     <Button icon={<Close size="medium" />} onClick={(): void => showModal(false)} />
-                    <Heading level="4">Disable Task</Heading>
+                    <Heading level="4">{capitalize(header)} Task</Heading>
                 </Box>
                 <Box margin="small" direction="row" gap="small">
                     <Text>
-                        Are you sure you would like to disable your task?
+                        Are you sure you would like to {header} your task?
                         <Box pad="xsmall" background="light-4">
                             <pre>{name}</pre>
                         </Box>
@@ -36,8 +41,16 @@ const DisableModal: React.FC<DisableModalProps> = (props: DisableModalProps): JS
                     <Button
                         primary
                         color="brand"
-                        label="Disable"
-                        onClick={(): void => console.log('disable')}
+                        label={capitalize(header)}
+                        onClick={async (): Promise<void> => {
+                            if (enabled) {
+                                await disableTask(id);
+                            } else {
+                                // await disableTask(id);
+                            }
+
+                            showModal(false);
+                        }}
                         style={{ borderRadius: '4px' }}
                     />
                 </Box>
@@ -46,4 +59,4 @@ const DisableModal: React.FC<DisableModalProps> = (props: DisableModalProps): JS
     );
 };
 
-export default DisableModal;
+export default IsEnabledModal;
