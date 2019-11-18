@@ -1,3 +1,6 @@
+[![Actions Status](https://github.com/roger-king/tasker/workflows/Backend/badge.svg)](https://github.com/roger-king/tasker/actions)
+[![Actions Status](https://github.com/roger-king/tasker/workflows/Frontend/badge.svg)](https://github.com/roger-king/tasker/actions)
+
 <p align="center">
     <img src="./www/public/images/flash.png" width="200px">
 </p>
