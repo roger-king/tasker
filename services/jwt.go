@@ -9,7 +9,7 @@ import (
 )
 
 func GenerateJWTToken(user *models.User) (string, time.Time, error) {
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Add(120 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &models.UserClaims{
 		User: models.User{},
