@@ -16,6 +16,7 @@ func NewRouter(taskService *services.TaskService, github *services.GithubAuthSer
 	r.HandleFunc("/check", CheckSession()).Methods("GET")
 
 	apiRouter := r.PathPrefix("/tasker").Subrouter()
+	apiRouter.Use(authMiddleware)
 	apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
 	apiRouter.HandleFunc("/tasks", CreateTask(taskService)).Methods("POST")
 
@@ -27,7 +28,7 @@ func NewRouter(taskService *services.TaskService, github *services.GithubAuthSer
 	// Web Admin - We have a reverse proxy for working on local developer :)
 	r.PathPrefix("/static/").HandlerFunc(ServeWebAdmin)
 	r.PathPrefix("/images/").HandlerFunc(ServeWebAdmin)
-	apiRouter.PathPrefix("/admin").HandlerFunc(ServeWebAdmin)
+	r.PathPrefix("/tasker/admin").HandlerFunc(ServeWebAdmin)
 
 	// authenticate route
 	// Public routes for github access
