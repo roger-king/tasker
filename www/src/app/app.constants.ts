@@ -2,14 +2,6 @@ import { ThemeType } from 'grommet';
 
 export const theme: ThemeType = {
     global: {
-        breakpoints: {
-            small: {
-                value: 900,
-            },
-            medium: {
-                value: 3000,
-            },
-        },
         colors: {
             background: '#1a1d21',
             brand: '#282c34',

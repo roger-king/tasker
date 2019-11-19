@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
-import { Box, Button, DropButton, CheckBox, Heading, Text } from 'grommet';
+import { Box, Button, DropButton, CheckBox, Heading, Text, ResponsiveContext } from 'grommet';
 import { MoreVertical } from 'grommet-icons';
 import { useHistory } from 'react-router';
 import DeleteTaskModal from '../modals/delete';
@@ -19,6 +19,9 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
     const completeText = complete ? 'Completed' : 'Not Executed';
     const [showModal, setShowModal] = useState<boolean>(false);
     const history = useHistory();
+    const size = useContext(ResponsiveContext);
+
+    console.log(size);
 
     return (
         <Box
@@ -38,7 +41,7 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
                 </Heading>
             </Box>
             <Box width="50%" align="center">
-                <Text wordBreak="break-all">{description}</Text>
+                <Text wordBreak="keep-all">{description}</Text>
             </Box>
             <Box width="30%" justify="end" direction="row" align="center">
                 <Text>
