@@ -200,7 +200,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                                 label="Create"
                                 style={{ borderRadius: '7px' }}
                                 disabled={disableCreate}
-                                onClick={(): void => create()}
+                                onClick={(): Promise<void> => create()}
                             />
                         </Box>
                     )}
