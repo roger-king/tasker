@@ -1,63 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Box, Button, FormField, Heading, Layer, TextInput } from 'grommet';
 import { Close, Add, Subtract } from 'grommet-icons';
 
+import { createTask } from '../../data/tasker';
+
 interface ArgsProps {
-    keyArg: string;
-    setKey: any;
-    valueArg: any;
-    setValue: any;
+    index: number;
+    addRow(key: string, value: any): void;
+    isNewRow: boolean;
+    removeRow(index: number, key: string): void;
 }
 
 const ArgsField: React.FC<ArgsProps> = (props: ArgsProps): JSX.Element => {
-    const { keyArg, valueArg, setKey, setValue } = props;
-    const onChange = (e: any) => {
-        if (e.target.name === 'key') {
-            setKey(e.target.value);
-        } else if (e.target.name === 'value') {
-            setValue(e.target.value);
+    const { addRow, isNewRow, index, removeRow } = props;
+    const [disableAddRow, setdisableAddRow] = useState<boolean>(true);
+    const [currKey, setCurrKey] = useState<string>('');
+    const [currValue, setCurrValue] = useState<any>('');
+
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
+        const { name, value } = e.target;
+        if (name === 'key') {
+            setCurrKey(value);
+        } else if (name === 'value') {
+            setCurrValue(value);
+        }
+
+        if (currKey.length > 0 && currValue.length > 0) {
+            setdisableAddRow(false);
+        } else {
+            setdisableAddRow(true);
         }
     };
+
     return (
         <Box direction="row" gap="small">
-            <TextInput name="key" placeholder="Key" onChange={onChange} value={keyArg} />
-            <TextInput name="value" placeholder="Value" onChange={onChange} value={valueArg} />
+            <TextInput name="key" placeholder="Key" onChange={onChange} value={currKey} />
+            <TextInput name="value" placeholder="Value" onChange={onChange} value={currValue} />
+            {isNewRow ? (
+                <Button
+                    icon={<Add size="small" />}
+                    onClick={(): void => addRow(currKey, currValue)}
+                    disabled={disableAddRow}
+                />
+            ) : (
+                <Button icon={<Subtract size="small" />} onClick={(): void => removeRow(index, currKey)} />
+            )}
         </Box>
     );
 };
 
 interface ArgsListProps {
-    args: Map<string, string | Record<string, any>>;
+    args: Argument[];
     setArgs: any;
 }
 
 const ArgsFieldList: React.FC<ArgsListProps> = (props: ArgsListProps) => {
     const { args, setArgs } = props;
-    const [keyArg, setKey] = useState<string>('');
-    const [valueArg, setValue] = useState<any>('');
-    const [fields, setFields] = useState<number[]>([1]);
-    const newRow = (): void => {
-        setFields([...fields, fields.length + 1]);
-        setArgs(args.set(keyArg, valueArg));
+    const [fields, setFields] = useState<number[]>([Number(1)]);
+
+    const addRow = (key: string, value: any): void => {
+        const foundArg = args.filter((arg: Argument) => arg.key === key);
+
+        if (foundArg.length === 0) {
+            setFields([...fields, fields.length + 1]);
+            setArgs([...args, { key, value }]);
+        }
+    };
+
+    const removeRow = (index: number, key: string): void => {
+        const f = fields.map(num => {
+            if (num !== index) {
+                return num;
+            }
+            return 0;
+        });
+        setFields(f);
+
+        const newArgs = args.filter((arg: Argument) => arg.key !== key);
+        setArgs([...newArgs]);
     };
 
     return (
-        <Box direction="column">
-            {fields.map((i: number) => {
-                if (i === fields.length) {
+        <Box direction="column" gap="small">
+            {/* eslint-disable react/no-array-index-key */}
+            {/* eslint-disable-next-line */}
+            {fields.map((num: number, i: number): JSX.Element | void => {
+                if (num !== 0) {
                     return (
-                        <Box key={i} direction="row">
-                            <ArgsField keyArg={keyArg} setKey={setKey} valueArg={valueArg} setValue={setValue} />
-                            <Button icon={<Add size="small" />} onClick={newRow} />
-                        </Box>
+                        <ArgsField
+                            key={i}
+                            index={num}
+                            addRow={addRow}
+                            isNewRow={num === fields[fields.length - 1]}
+                            removeRow={removeRow}
+                        />
                     );
                 }
-                return (
-                    <Box key={i} direction="row">
-                        <ArgsField keyArg={keyArg} setKey={setKey} valueArg={valueArg} setValue={setValue} />
-                        <Button icon={<Subtract size="small" />} onClick={() => console.log('hello')} />
-                    </Box>
-                );
             })}
         </Box>
     );
@@ -70,8 +108,13 @@ interface CreateTaskModalProps {
 const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalProps): JSX.Element => {
     const { showModal } = props;
     const [next, setNext] = useState<boolean>(false);
-    const [createTaskInput, setCreateTaskInput] = useState<Map<string, string | Record<string, any>>>(new Map());
-    const [args, setArgs] = useState<Map<string, string | Record<string, any>>>(new Map());
+    const [createTaskInput, setCreateTaskInput] = useState<Partial<NewTaskInput>>({
+        name: '',
+        schedule: '',
+        description: '',
+        executor: '',
+    });
+    const [args, setArgs] = useState<Argument[]>([{ key: '', value: '' }]);
     const [disableNext, setDisableNext] = useState<boolean>(true);
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars  */
     const [disableCreate, setDisableCreate] = useState<boolean>(true);
@@ -80,19 +123,30 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         const key = e.target.name;
         const value = e.target.value;
 
-        if (value.length > 0) {
-            setCreateTaskInput(createTaskInput.set(key, value));
-        } else {
-            createTaskInput.delete(key);
-            setCreateTaskInput(createTaskInput);
-        }
+        setCreateTaskInput({ ...createTaskInput, [key]: value });
 
-        if (createTaskInput.size === 4) {
+        if (Object.keys(createTaskInput).length === 4) {
             setDisableNext(false);
         } else {
             setDisableNext(true);
         }
     };
+
+    const create = async (): Promise<void> => {
+        const input: any = { ...createTaskInput, args: {} };
+        /* eslint-disable-next-line */
+        args.map((a: Argument, i: number): void => {
+            input.args[a.key] = a.value;
+        });
+
+        await createTask(input);
+    };
+
+    useEffect(() => {
+        if (args.length > 1) {
+            setDisableCreate(false);
+        }
+    }, [args.length]);
 
     return (
         <Layer modal onClickOutside={(): void => showModal()} onEsc={(): void => showModal()}>
@@ -105,29 +159,49 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                     {!next ? (
                         <Box>
                             <FormField label="Name">
-                                <TextInput name="name" onChange={onChange} required />
+                                <TextInput name="name" onChange={onChange} value={createTaskInput.name} required />
                             </FormField>
                             <FormField label="Description">
-                                <TextInput name="description" onChange={onChange} required />
+                                <TextInput
+                                    name="description"
+                                    onChange={onChange}
+                                    value={createTaskInput.description}
+                                    required
+                                />
                             </FormField>
                             <FormField label="Schedule">
-                                <TextInput name="schedule" onChange={onChange} required />
+                                <TextInput
+                                    name="schedule"
+                                    onChange={onChange}
+                                    value={createTaskInput.schedule}
+                                    required
+                                />
                             </FormField>
                             <FormField label="Executor">
-                                <TextInput name="executor" onChange={onChange} required />
+                                <TextInput
+                                    name="executor"
+                                    onChange={onChange}
+                                    value={createTaskInput.executor}
+                                    required
+                                />
                             </FormField>
                             <Button
                                 label="Next"
                                 onClick={(): void => setNext(true)}
                                 style={{ borderRadius: '7px' }}
-                                disabled={!disableNext}
+                                disabled={disableNext}
                             />
                         </Box>
                     ) : (
-                        <Box fill>
+                        <Box fill gap="small">
                             <Heading level="4">Args: </Heading>
                             <ArgsFieldList args={args} setArgs={setArgs} />
-                            <Button label="Create" style={{ borderRadius: '7px' }} disabled={disableCreate} />
+                            <Button
+                                label="Create"
+                                style={{ borderRadius: '7px' }}
+                                disabled={disableCreate}
+                                onClick={(): void => create()}
+                            />
                         </Box>
                     )}
                 </Box>

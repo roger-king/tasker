@@ -33,6 +33,11 @@ interface NewTaskInput {
     executor: string;
 }
 
+interface Argument {
+    key: string;
+    value: string;
+}
+
 type OK = 'OK';
 
 interface GithubOAuthLoginResponse extends GithhubOAuthhErrorResponse {
