@@ -1,0 +1,79 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`<DatePicker /> Matches the snapshot with datepicker closed 1`] = `
+<button
+  aria-label="Open Drop"
+  className="StyledButton-sc-323bzc-0 jfbKsv"
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseOut={[Function]}
+  onMouseOver={[Function]}
+  type="button"
+>
+  <div
+    className="StyledBox-sc-13pk1d4-0 bLOKyd"
+  >
+    <span
+      className="StyledText-sc-1sadyjn-0 fWSbXS"
+    >
+      11/23/2019
+    </span>
+    <div
+      className="StyledBox-sc-13pk1d4-0 bspmCs"
+    >
+      <svg
+        aria-label="Calendar"
+        className="StyledIcon-ofa7kd-0 btwGsx"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M2,5 L22,5 L22,22 L2,22 L2,5 Z M18,5 L18,1 M6,5 L6,1 M2,10 L22,10"
+          fill="none"
+          stroke="#000"
+          strokeWidth="2"
+        />
+      </svg>
+    </div>
+  </div>
+</button>
+`;
+
+exports[`<DatePicker /> Matches the snapshot with datepicker open 1`] = `
+<button
+  aria-label="Open Drop"
+  className="StyledButton-sc-323bzc-0 jfbKsv"
+  onBlur={[Function]}
+  onClick={[Function]}
+  onFocus={[Function]}
+  onMouseOut={[Function]}
+  onMouseOver={[Function]}
+  type="button"
+>
+  <div
+    className="StyledBox-sc-13pk1d4-0 bLOKyd"
+  >
+    <span
+      className="StyledText-sc-1sadyjn-0 fWSbXS"
+    >
+      11/23/2019
+    </span>
+    <div
+      className="StyledBox-sc-13pk1d4-0 bspmCs"
+    >
+      <svg
+        aria-label="Calendar"
+        className="StyledIcon-ofa7kd-0 btwGsx"
+        viewBox="0 0 24 24"
+      >
+        <path
+          d="M2,5 L22,5 L22,22 L2,22 L2,5 Z M18,5 L18,1 M6,5 L6,1 M2,10 L22,10"
+          fill="none"
+          stroke="#000"
+          strokeWidth="2"
+        />
+      </svg>
+    </div>
+  </div>
+</button>
+`;
