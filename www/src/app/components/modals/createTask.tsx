@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, FormField, Heading, Layer, TextInput } from 'grommet';
+import { Box, Button, FormField, Heading, Layer, TextInput, CheckBox } from 'grommet';
 import { Close, Add, Subtract } from 'grommet-icons';
 
 import { createTask } from '../../data/tasker';
+import DatePicker from '../datepicker';
 
 interface ArgsProps {
     index: number;
@@ -114,10 +115,18 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         description: '',
         executor: '',
     });
+    const [isRepeating, setIsRepeating] = useState<boolean>(false);
     const [args, setArgs] = useState<Argument[]>([{ key: '', value: '' }]);
+    const [showCalendar, setShowCalendar] = useState<boolean>(false);
+    const [date, setDate] = React.useState();
     const [disableNext, setDisableNext] = useState<boolean>(true);
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars  */
     const [disableCreate, setDisableCreate] = useState<boolean>(true);
+
+    const onDateSelect = (selectedDate: any) => {
+        setDate(selectedDate);
+        setShowCalendar(false);
+    };
 
     const onChange = (e: any): void => {
         const key = e.target.name;
@@ -170,11 +179,11 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                                 />
                             </FormField>
                             <FormField label="Schedule">
-                                <TextInput
-                                    name="schedule"
-                                    onChange={onChange}
-                                    value={createTaskInput.schedule}
-                                    required
+                                <DatePicker
+                                    setShowCalendar={setShowCalendar}
+                                    showCalendar={showCalendar}
+                                    date={date}
+                                    onSelect={onDateSelect}
                                 />
                             </FormField>
                             <FormField label="Executor">
@@ -196,6 +205,11 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                         <Box fill gap="small">
                             <Heading level="4">Args: </Heading>
                             <ArgsFieldList args={args} setArgs={setArgs} />
+                            <CheckBox
+                                checked={isRepeating}
+                                onChange={() => setIsRepeating(!isRepeating)}
+                                label="Repeating?"
+                            />
                             <Button
                                 label="Create"
                                 style={{ borderRadius: '7px' }}
