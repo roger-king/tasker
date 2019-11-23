@@ -25,6 +25,12 @@ interface Task {
     deletedAt: Date;
 }
 
+interface Time {
+    hour: number;
+    minute: number;
+}
+type NewTaskInputKey = keyof NewTaskInput;
+
 interface NewTaskInput {
     name: string;
     description: string;
