@@ -4,6 +4,7 @@ import { Close, Add, Subtract } from 'grommet-icons';
 
 import { createTask } from '../../data/tasker';
 import DatePicker from '../datepicker';
+import TimePicker from '../timepicker';
 
 interface ArgsProps {
     index: number;
@@ -111,21 +112,27 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     const [next, setNext] = useState<boolean>(false);
     const [createTaskInput, setCreateTaskInput] = useState<Partial<NewTaskInput>>({
         name: '',
-        schedule: '',
+        schedule: new Date().toLocaleDateString(),
         description: '',
         executor: '',
     });
+    const [time, setTime] = useState<Time>({ hour: new Date().getHours(), minute: new Date().getMinutes() });
     const [isRepeating, setIsRepeating] = useState<boolean>(false);
     const [args, setArgs] = useState<Argument[]>([{ key: '', value: '' }]);
     const [showCalendar, setShowCalendar] = useState<boolean>(false);
-    const [date, setDate] = React.useState();
     const [disableNext, setDisableNext] = useState<boolean>(true);
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars  */
     const [disableCreate, setDisableCreate] = useState<boolean>(true);
 
     const onDateSelect = (selectedDate: any) => {
-        setDate(selectedDate);
+        setCreateTaskInput({ ...createTaskInput, schedule: selectedDate });
         setShowCalendar(false);
+    };
+
+    const onTimeSelect = (e: any) => {
+        const { name, value } = e.target;
+
+        setTime({ ...time, [name]: value });
     };
 
     const onChange = (e: any): void => {
@@ -133,12 +140,17 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         const value = e.target.value;
 
         setCreateTaskInput({ ...createTaskInput, [key]: value });
+    };
 
-        if (Object.keys(createTaskInput).length === 4) {
-            setDisableNext(false);
-        } else {
-            setDisableNext(true);
+    const shouldDisableNext = () => {
+        for (const key of Object.keys(createTaskInput)) {
+            const k: NewTaskInputKey = key as NewTaskInputKey;
+            if (createTaskInput[k]!.length === 0) {
+                setDisableNext(true);
+                return;
+            }
         }
+        setDisableNext(false);
     };
 
     const create = async (): Promise<void> => {
@@ -155,7 +167,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         if (args.length > 1) {
             setDisableCreate(false);
         }
-    }, [args.length]);
+        shouldDisableNext();
+    }, [args.length, createTaskInput, shouldDisableNext]);
 
     return (
         <Layer modal onClickOutside={(): void => showModal()} onEsc={(): void => showModal()}>
@@ -179,12 +192,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                                 />
                             </FormField>
                             <FormField label="Schedule">
-                                <DatePicker
-                                    setShowCalendar={setShowCalendar}
-                                    showCalendar={showCalendar}
-                                    date={date}
-                                    onSelect={onDateSelect}
-                                />
+                                <Box direction="row" gap="small">
+                                    <DatePicker
+                                        setShowCalendar={setShowCalendar}
+                                        showCalendar={showCalendar}
+                                        date={createTaskInput.schedule}
+                                        onSelect={onDateSelect}
+                                    />
+                                    <TimePicker onChange={onTimeSelect} time={time} />
+                                </Box>
                             </FormField>
                             <FormField label="Executor">
                                 <TextInput
