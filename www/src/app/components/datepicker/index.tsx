@@ -17,7 +17,7 @@ const DatePicker: React.FC<DatePickerProps> = (props: DatePickerProps) => {
             onClose={() => setShowCalendar(false)}
             onOpen={() => setShowCalendar(true)}
             dropAlign={{ top: 'bottom', right: 'right' }}
-            dropContent={<Calendar date={date} onSelect={onSelect} />}
+            dropContent={<Calendar date={date} onSelect={onSelect} size="small" />}
         >
             <Box direction="row" align="center" justify="between" pad={{ left: '10px', right: '10px' }}>
                 <Text>{date ? new Date(date).toLocaleDateString() : new Date().toLocaleDateString()}</Text>
