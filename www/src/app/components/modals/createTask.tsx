@@ -115,7 +115,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     const defaultMinute = d.getMinutes();
     const [createTaskInput, setCreateTaskInput] = useState<Partial<NewTaskInput>>({
         name: '',
-        schedule: d.toLocaleDateString(),
+        schedule: d.toISOString(),
         description: '',
         executor: '',
     });
@@ -128,6 +128,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     const [disableCreate, setDisableCreate] = useState<boolean>(true);
 
     const onDateSelect = (selectedDate: any) => {
+        console.log(selectedDate);
         setCreateTaskInput({ ...createTaskInput, schedule: selectedDate });
         setShowCalendar(false);
     };
@@ -146,8 +147,11 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
 
     const onNext = (): void => {
         setNext(true);
-
-        // const detailedInput = { ...createTaskInput, schedule: '' };
+        const selectedMonth = new Date(createTaskInput.schedule!).getMonth() + 1;
+        const selectedDayOfWeek = new Date(createTaskInput.schedule!).getDay();
+        const selectedDayOfMonth = new Date(createTaskInput.schedule!).getDate();
+        const cronTab = `* ${time.minute} ${time.hour} ${selectedDayOfMonth} ${selectedMonth} ${selectedDayOfWeek} `;
+        setCreateTaskInput({ ...createTaskInput, schedule: cronTab });
     };
 
     const create = async (): Promise<void> => {
