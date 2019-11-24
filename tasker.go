@@ -58,8 +58,9 @@ func (t *Tasker) Start() *mux.Router {
 		Scheduler: t.Scheduler,
 	}
 
+	settingService := services.NewSettingService(t.DB)
 	githubService := services.NewGithubAuthService()
 
-	r := handlers.NewRouter(taskService, githubService, t.DB)
+	r := handlers.NewRouter(taskService, settingService, githubService, t.DB)
 	return r
 }

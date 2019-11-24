@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func NewRouter(taskService *services.TaskService, github *services.GithubAuthService, db *mongo.Client) *mux.Router {
+func NewRouter(taskService *services.TaskService, settingService *services.SettingService, github *services.GithubAuthService, db *mongo.Client) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/check", CheckSession()).Methods("GET")
@@ -24,6 +24,10 @@ func NewRouter(taskService *services.TaskService, github *services.GithubAuthSer
 	apiRouter.HandleFunc("/tasks/{taskID}", FindTask(taskService)).Methods("GET")
 	apiRouter.HandleFunc("/tasks/{taskID}/disable", DisableTask(taskService)).Methods("PATCH")
 	apiRouter.HandleFunc("/tasks/{taskID}", DeleteTask(taskService)).Methods("DELETE")
+
+	// Setting Routes
+	apiRouter.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
+	apiRouter.HandleFunc("/settings/plugin", CreatePluginSetting(settingService)).Methods("POST")
 
 	// Web Admin - We have a reverse proxy for working on local developer :)
 	r.PathPrefix("/static/").HandlerFunc(ServeWebAdmin)
