@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Route, Redirect, RouteProps } from 'react-router-dom';
 import { Box, Grid } from 'grommet';
 import { TasksPage, OverviewPage, SettingsPage, TaskPage } from './pages';
 import { check } from './data/auth';
 
 import Header from './components/header';
+import Notification from './components/notification';
 
 export interface ProtectedRouteProps extends RouteProps {
     authenticationPath: string;
@@ -42,6 +43,9 @@ const defaultProtectedRouteProps: ProtectedRouteProps = {
 };
 
 const RouterContainer: React.FC<{}> = (): JSX.Element => {
+    /* eslint-disable-next-line */
+    const [showNotification, setShowNotification] = useState<boolean>(false);
+
     return (
         <Grid
             fill
@@ -74,6 +78,7 @@ const RouterContainer: React.FC<{}> = (): JSX.Element => {
                     component={TaskPage}
                 />
             </Box>
+            {showNotification && <Notification type="success" />}
         </Grid>
     );
 };
