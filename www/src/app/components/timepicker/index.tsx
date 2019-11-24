@@ -11,11 +11,16 @@ interface TimePickerProps {
 
 const TimePicker: React.FC<TimePickerProps> = (props: TimePickerProps) => {
     const {
+        onChange,
         time: { hour, minute },
     } = props;
     const [showPicker, setShowPicker] = useState<boolean>(false);
+    // TODO: fix this to display leading 0
+    const defaultHour = String(hour).length === 1 ? `0${String(hour)}` : String(hour);
+    const defaultMinute = String(minute).length === 1 ? `0${String(minute)}` : String(minute);
     const hours = range(0, 23);
     const minutes = range(0, 59);
+    // TODO: support 12 hour time
     const AMPM = hour >= 12 ? 'pm' : 'am';
     return (
         <DropButton
@@ -25,14 +30,31 @@ const TimePicker: React.FC<TimePickerProps> = (props: TimePickerProps) => {
             dropAlign={{ top: 'bottom', left: 'left' }}
             dropContent={
                 <Box direction="row" width="300px">
-                    <Select options={hours} open size="xsmall" value={String(hour)} icon={false} plain />
-                    <Select options={minutes} open size="xsmall" value={String(minute)} icon={false} plain />
-                    <Select options={['am', 'pm']} open size="xsmall" value={AMPM} icon={false} plain />
+                    <Select
+                        name="hour"
+                        options={hours}
+                        open
+                        size="xsmall"
+                        value={defaultHour}
+                        icon={false}
+                        plain
+                        onChange={onChange}
+                    />
+                    <Select
+                        name="minute"
+                        options={minutes}
+                        open
+                        size="xsmall"
+                        value={defaultMinute}
+                        icon={false}
+                        plain
+                        onChange={onChange}
+                    />
                 </Box>
             }
         >
             <Box direction="row" align="center" justify="between" pad={{ left: '10px', right: '10px' }}>
-                <Text>{`${hour}: ${minute} ${'PM'}`}</Text>
+                <Text>{`${hour}: ${minute} ${AMPM}`}</Text>
                 <Box alignSelf="end" margin="xsmall">
                     <Clock color="accent-1" />
                 </Box>
