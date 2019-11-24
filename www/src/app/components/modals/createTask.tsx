@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Box, Button, FormField, Heading, Layer, TextInput, CheckBox } from 'grommet';
 import { Close, Add, Subtract } from 'grommet-icons';
 
@@ -110,13 +110,16 @@ interface CreateTaskModalProps {
 const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalProps): JSX.Element => {
     const { showModal } = props;
     const [next, setNext] = useState<boolean>(false);
+    const d = new Date();
+    const defaultHour = d.getHours();
+    const defaultMinute = d.getMinutes();
     const [createTaskInput, setCreateTaskInput] = useState<Partial<NewTaskInput>>({
         name: '',
-        schedule: new Date().toLocaleDateString(),
+        schedule: d.toLocaleDateString(),
         description: '',
         executor: '',
     });
-    const [time, setTime] = useState<Time>({ hour: new Date().getHours(), minute: new Date().getMinutes() });
+    const [time, setTime] = useState<Time>({ hour: defaultHour, minute: defaultMinute });
     const [isRepeating, setIsRepeating] = useState<boolean>(false);
     const [args, setArgs] = useState<Argument[]>([{ key: '', value: '' }]);
     const [showCalendar, setShowCalendar] = useState<boolean>(false);
@@ -130,9 +133,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     };
 
     const onTimeSelect = (e: any) => {
-        const { name, value } = e.target;
-
-        setTime({ ...time, [name]: value });
+        const { name } = e.target;
+        setTime({ ...time, [name]: e.value });
     };
 
     const onChange = (e: any): void => {
@@ -142,15 +144,10 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         setCreateTaskInput({ ...createTaskInput, [key]: value });
     };
 
-    const shouldDisableNext = () => {
-        for (const key of Object.keys(createTaskInput)) {
-            const k: NewTaskInputKey = key as NewTaskInputKey;
-            if (createTaskInput[k]!.length === 0) {
-                setDisableNext(true);
-                return;
-            }
-        }
-        setDisableNext(false);
+    const onNext = (): void => {
+        setNext(true);
+
+        // const detailedInput = { ...createTaskInput, schedule: '' };
     };
 
     const create = async (): Promise<void> => {
@@ -163,6 +160,17 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         await createTask(input);
     };
 
+    const shouldDisableNext = useCallback(() => {
+        for (const key of Object.keys(createTaskInput)) {
+            const k: NewTaskInputKey = key as NewTaskInputKey;
+            if (createTaskInput[k]!.length === 0) {
+                setDisableNext(true);
+                return;
+            }
+        }
+        setDisableNext(false);
+    }, [createTaskInput]);
+
     useEffect(() => {
         if (args.length > 1) {
             setDisableCreate(false);
@@ -171,7 +179,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     }, [args.length, createTaskInput, shouldDisableNext]);
 
     return (
-        <Layer modal onClickOutside={(): void => showModal()} onEsc={(): void => showModal()}>
+        <Layer modal onEsc={(): void => showModal()}>
             <Box width="large" pad="medium">
                 <Box direction="row">
                     <Button icon={<Close size="medium" />} onClick={(): void => showModal()} />
@@ -212,7 +220,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                             </FormField>
                             <Button
                                 label="Next"
-                                onClick={(): void => setNext(true)}
+                                onClick={(): void => onNext()}
                                 style={{ borderRadius: '7px' }}
                                 disabled={disableNext}
                             />
