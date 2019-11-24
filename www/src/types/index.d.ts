@@ -25,6 +25,14 @@ interface Task {
     deletedAt: Date;
 }
 
+interface CronTab {
+    second: string | number;
+    minute: string | number;
+    hour: string | number;
+    dayOfMonth: string | number;
+    month: string | number;
+    dayOfWeek: string | number;
+}
 interface Time {
     hour: number;
     minute: number;
