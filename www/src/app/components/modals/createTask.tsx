@@ -150,7 +150,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         const selectedMonth = new Date(createTaskInput.schedule!).getMonth() + 1;
         const selectedDayOfWeek = new Date(createTaskInput.schedule!).getDay();
         const selectedDayOfMonth = new Date(createTaskInput.schedule!).getDate();
-        const cronTab = `* ${time.minute} ${time.hour} ${selectedDayOfMonth} ${selectedMonth} ${selectedDayOfWeek} `;
+        const cronTab = `${time.minute} ${time.hour} ${selectedDayOfMonth} ${selectedMonth} ${selectedDayOfWeek} `;
         setCreateTaskInput({ ...createTaskInput, schedule: cronTab });
     };
 
@@ -158,10 +158,13 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
         const input: any = { ...createTaskInput, args: {} };
         /* eslint-disable-next-line */
         args.map((a: Argument, i: number): void => {
-            input.args[a.key] = a.value;
+            if (a.key !== '' && a.value !== '') {
+                input.args[a.key] = a.value;
+            }
         });
 
         await createTask(input);
+        showModal(false);
     };
 
     const shouldDisableNext = useCallback(() => {
