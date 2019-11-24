@@ -3,7 +3,7 @@ import { Box, Heading } from 'grommet';
 
 const SettingsPage: React.FC<{}> = (): JSX.Element => {
     return (
-        <Box>
+        <Box margin={{ left: '300px', right: '300px' }}>
             <Heading> Settings </Heading>
         </Box>
     );
