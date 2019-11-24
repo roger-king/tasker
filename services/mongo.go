@@ -58,7 +58,6 @@ func (m *MongoService) List() ([]*models.Task, error) {
 	cur, err := m.Collection.Find(ctx, bson.M{}, options)
 
 	if err != nil {
-		log.Info("This is dumb", err)
 		return nil, err
 	}
 
