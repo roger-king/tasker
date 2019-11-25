@@ -59,24 +59,13 @@ const RouterContainer: React.FC<{}> = (): JSX.Element => {
             <Header gridArea="header" />
             <Box gridArea="main" fill>
                 <ProtectedRoute {...defaultProtectedRouteProps} exact path="/tasker/admin" component={OverviewPage} />
+                <ProtectedRoute {...defaultProtectedRouteProps} path="/tasker/admin/tasks" component={TasksPage} />
                 <ProtectedRoute
                     {...defaultProtectedRouteProps}
-                    exact
-                    path="/tasker/admin/tasks"
-                    component={TasksPage}
-                />
-                <ProtectedRoute
-                    {...defaultProtectedRouteProps}
-                    exact
                     path="/tasker/admin/settings"
                     component={SettingsPage}
                 />
-                <ProtectedRoute
-                    {...defaultProtectedRouteProps}
-                    exact
-                    path="/tasker/admin/task/:id"
-                    component={TaskPage}
-                />
+                <ProtectedRoute {...defaultProtectedRouteProps} path="/tasker/admin/task/:id" component={TaskPage} />
             </Box>
             {showNotification && <Notification type="success" />}
         </Grid>
