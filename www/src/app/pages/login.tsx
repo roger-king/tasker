@@ -5,7 +5,7 @@ import qs, { ParsedQuery } from 'query-string';
 import GithubOAuthLoginBtn from '../components/oauth/github';
 
 import { authenticate, fetchUserClientId, check } from '../data/auth';
-import { GITHUB_LOGIN_SCOPE, LOGIN_STATUS } from '../app.constants';
+import { GITHUB_LOGIN_SCOPE, LOGIN_STATUS, REDIRECT_URL } from '../app.constants';
 import Logo from '../components/logo';
 
 const LoginPage: React.FC = () => {
@@ -17,6 +17,8 @@ const LoginPage: React.FC = () => {
     const isDisabled = clientId.length === 0;
 
     useEffect(() => {
+        const redirectURL = sessionStorage.getItem(REDIRECT_URL);
+
         check().then(isAuthed => {
             if (isAuthed) {
                 history.push('/tasker/admin');
@@ -38,9 +40,13 @@ const LoginPage: React.FC = () => {
                             return;
                         }
 
-                        // setCookie(data.data);
                         setStatus(LOGIN_STATUS.SUCCESS);
-                        history.push('/tasker/admin');
+                        if (redirectURL) {
+                            history.push(redirectURL);
+                            sessionStorage.removeItem(REDIRECT_URL);
+                        } else {
+                            history.push('/tasker/admin');
+                        }
                     });
                 }
             } else {

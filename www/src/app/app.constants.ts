@@ -1,5 +1,7 @@
 import { ThemeType } from 'grommet';
 
+export const REDIRECT_URL = 'tasker_redirect_url';
+
 export const theme: ThemeType = {
     global: {
         colors: {

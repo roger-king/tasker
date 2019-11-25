@@ -3,7 +3,7 @@ import { Route, Redirect, RouteProps } from 'react-router-dom';
 import { Box, Grid } from 'grommet';
 import { TasksPage, OverviewPage, SettingsPage, TaskPage } from './pages';
 import { check } from './data/auth';
-
+import { REDIRECT_URL } from './app.constants';
 import Header from './components/header';
 import Notification from './components/notification';
 
@@ -31,6 +31,7 @@ export class ProtectedRoute extends Route<ProtectedRouteProps> {
         }
 
         if (redirectPath) {
+            sessionStorage.setItem(REDIRECT_URL, this.props.path as string);
             const renderComponent = (): JSX.Element => <Redirect to={{ pathname: redirectPath }} />;
             return <Route {...this.props} component={renderComponent} render={undefined} />;
         }
