@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Box, Button, DropButton, TextInput, Text } from 'grommet';
-import { User, Notification, Configure } from 'grommet-icons';
+import { Box, Button, DropButton, Heading, TextInput, Text } from 'grommet';
+import { User, Notification, Configure, Github } from 'grommet-icons';
 import { useHistory } from 'react-router';
 import Logo from '../logo';
 
@@ -73,7 +73,31 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                             </Box>
                         }
                     />
-                    <DropButton icon={<User />} dropContent={<Box />} />
+                    <DropButton
+                        icon={<User />}
+                        dropAlign={{ top: 'bottom', right: 'right' }}
+                        dropContent={
+                            <Box
+                                id="header-user-drop-content"
+                                width="200px"
+                                height="200px"
+                                align="center"
+                                direction="column"
+                            >
+                                <Heading level="5">Roger King</Heading>
+                                <Button
+                                    icon={<Github />}
+                                    label="Profile"
+                                    style={{ borderRadius: '7px' }}
+                                    color="brand"
+                                    primary
+                                    onClick={() => {
+                                        console.log('go to profile');
+                                    }}
+                                />
+                            </Box>
+                        }
+                    />
                 </Box>
             </Box>
         </Box>
