@@ -9,6 +9,12 @@ interface User {
     bio: string;
 }
 
+interface Setting {
+    type: string;
+    repo_name: string;
+    build_folder_name: string;
+}
+
 interface Task {
     taskId: string;
     entryId: number;
