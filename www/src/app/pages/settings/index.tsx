@@ -1,6 +1,6 @@
 import React from 'react';
 import { Box, Heading, Button } from 'grommet';
-import { Route, Switch, RouteComponentProps } from 'react-router-dom';
+import { Route, Switch, RouteComponentProps, Redirect } from 'react-router-dom';
 import PluginSettingsPage from './plugin';
 
 const SettingsPage: React.FC<RouteComponentProps> = (props: RouteComponentProps): JSX.Element => {
@@ -18,6 +18,7 @@ const SettingsPage: React.FC<RouteComponentProps> = (props: RouteComponentProps)
                 </Box>
                 <Switch>
                     <Route exact path={`${url}/plugin`} component={PluginSettingsPage} />
+                    <Redirect from={`${url}`} to={`${url}/plugin`} />
                 </Switch>
             </Box>
         </Box>
