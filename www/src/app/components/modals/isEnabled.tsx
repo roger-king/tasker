@@ -1,6 +1,6 @@
 import React from 'react';
-import { Box, Button, Heading, Layer, Text } from 'grommet';
-import { Close } from 'grommet-icons';
+import { Box, Button, Text } from 'grommet';
+import Modal from './index';
 import { capitalize } from '../../utils/case';
 
 import { disableTask } from '../../data/tasker';
@@ -17,12 +17,8 @@ const IsEnabledModal: React.FC<IsEnabledModalProps> = (props: IsEnabledModalProp
     const header = enabled ? 'disable' : 'enable';
 
     return (
-        <Layer modal onClickOutside={(): void => showModal(false)} onEsc={(): void => showModal(false)}>
-            <Box width="medium" pad="medium">
-                <Box direction="row">
-                    <Button icon={<Close size="medium" />} onClick={(): void => showModal(false)} />
-                    <Heading level="4">{capitalize(header)} Task</Heading>
-                </Box>
+        <Modal setShowModal={showModal} width="medium" header={capitalize(header)} onClickOutside={false} onEsc>
+            <Box>
                 <Box margin="small" direction="row" gap="small">
                     <Text>
                         Are you sure you would like to {header} your task?
@@ -55,7 +51,7 @@ const IsEnabledModal: React.FC<IsEnabledModalProps> = (props: IsEnabledModalProp
                     />
                 </Box>
             </Box>
-        </Layer>
+        </Modal>
     );
 };
 
