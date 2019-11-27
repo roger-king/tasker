@@ -1,93 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import {
-    Box,
-    Heading,
-    Text,
-    CheckBox,
-    Table,
-    TableRow,
-    TableCell,
-    TableBody,
-    Button,
-    Anchor,
-    Form,
-    FormField,
-    TextInput,
-} from 'grommet';
+import { Box, Heading, Text, CheckBox, Table, TableRow, TableCell, TableBody, Button } from 'grommet';
 import { StatusInfo } from 'grommet-icons';
-import { listSettings, toggleActivePluginSetting, createSetting } from '../../data/settings';
-import Modal, { BaseModalProps } from '../../components/modals';
-
-interface AddPluginModalProps extends BaseModalProps {
-    setShowModal: any;
-}
-
-const AddPluginModal: React.FC<AddPluginModalProps> = (props: AddPluginModalProps): JSX.Element => {
-    const { setShowModal } = props;
-    return (
-        <Modal setShowModal={setShowModal} header="Add Repository" width="large" onClickOutside onEsc>
-            <Box>
-                <Form
-                    onSubmit={async ({ value }: any): Promise<void> => {
-                        const input = { ...value, type: 'plugin' };
-                        await createSetting(input);
-                        setShowModal(false);
-                    }}
-                >
-                    <FormField
-                        name="repo_name"
-                        component={TextInput}
-                        label="Github Repository"
-                        required
-                        placeholder="<github_username>/<repository_name>"
-                    />
-                    <FormField name="description" component={TextInput} label="Description" />
-                    <FormField
-                        name="build_folder_name"
-                        component={TextInput}
-                        placeholder="build"
-                        label="Build Folder Name"
-                        help="name of the folder your Go build process places your plugins"
-                        required
-                    />
-                    <FormField name="active" component={CheckBox} pad label="Is Active?" checked required />
-                    <Button label="add" primary type="submit" />
-                </Form>
-            </Box>
-        </Modal>
-    );
-};
-
-interface PluginInfoModalProps extends BaseModalProps {
-    setSetting: any;
-    setting: Setting;
-}
-
-const PluginInfoModal: React.FC<PluginInfoModalProps> = (props: PluginInfoModalProps) => {
-    const { setShowModal, setSetting, setting } = props;
-
-    return (
-        <Modal
-            // eslint-disable-next-line
-            setShowModal={(toggle: boolean = false): void => {
-                setSetting(null);
-                setShowModal(toggle);
-            }}
-            header="Info"
-            width="medium"
-            onClickOutside
-            onEsc
-        >
-            <Box gap="small">
-                <Heading level="4">{setting.repo_name}</Heading>
-                <Text>{setting.description}</Text>
-                <Anchor href={`https://github.com/${setting.repo_name}`} target="_blank">
-                    View Github
-                </Anchor>
-            </Box>
-        </Modal>
-    );
-};
+import { listSettings, toggleActivePluginSetting } from '../../data/settings';
+import AddPluginModal from '../../components/modals/createPlugin';
+import PluginInfoModal from '../../components/modals/pluginInfo';
 
 const PluginSettingPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
