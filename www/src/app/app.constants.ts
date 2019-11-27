@@ -1,4 +1,5 @@
 import { ThemeType } from 'grommet';
+import { css } from 'styled-components';
 
 export const REDIRECT_URL = 'tasker_redirect_url';
 
@@ -38,6 +39,46 @@ export const theme: ThemeType = {
                     family: 'Lato, sans-serif',
                 },
             },
+        },
+    },
+    checkBox: {
+        border: {
+            color: {
+                light: 'toggle-bg',
+            },
+        },
+        color: {
+            light: 'toggle-knob',
+        },
+        check: {
+            radius: '2px',
+        },
+        hover: {
+            border: {
+                color: undefined,
+            },
+        },
+        toggle: {
+            background: { light: 'toggle-accent' },
+            color: {
+                light: 'toggle-knob',
+            },
+            size: '36px',
+            knob: {
+                extend: `
+                top: -7px;
+                box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.12),
+                 0px 2px 2px 0px rgba(0,0,0,0.24);
+              `,
+            },
+            extend: ({ checked }) => `
+              height: 14px;
+              ${checked &&
+                  css`
+                      background-color: #2196f3;
+                      border-color: #2196f3;
+                  `}
+            `,
         },
     },
 };
