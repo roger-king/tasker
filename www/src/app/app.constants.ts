@@ -14,7 +14,7 @@ export const theme: ThemeType = {
             warning: '#B33A3A',
         },
         font: {
-            family: 'Raleway, sans-serif',
+            family: 'Lato, sans-serif',
         },
     },
     heading: {
@@ -35,7 +35,7 @@ export const theme: ThemeType = {
             },
             4: {
                 font: {
-                    family: 'Viga, sans-serif',
+                    family: 'Lato, sans-serif',
                 },
             },
         },
