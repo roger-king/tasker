@@ -11,6 +11,8 @@ interface User {
 
 interface Setting {
     type: string;
+    active: boolean;
+    description: string;
     repo_name: string;
     build_folder_name: string;
 }
