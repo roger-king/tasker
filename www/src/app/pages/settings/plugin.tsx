@@ -31,6 +31,7 @@ const AddPluginModal: React.FC<AddPluginModalProps> = (props: AddPluginModalProp
                     onSubmit={async ({ value }: any): Promise<void> => {
                         const input = { ...value, type: 'plugin' };
                         await createSetting(input);
+                        setShowModal(false);
                     }}
                 >
                     <FormField
@@ -44,11 +45,12 @@ const AddPluginModal: React.FC<AddPluginModalProps> = (props: AddPluginModalProp
                     <FormField
                         name="build_folder_name"
                         component={TextInput}
+                        placeholder="build"
                         label="Build Folder Name"
                         help="name of the folder your Go build process places your plugins"
                         required
                     />
-                    <FormField name="active" component={CheckBox} pad label="Is Active?" checked />
+                    <FormField name="active" component={CheckBox} pad label="Is Active?" checked required />
                     <Button label="add" primary type="submit" />
                 </Form>
             </Box>
@@ -172,7 +174,15 @@ const PluginSettingPage: React.FC = () => {
                         setting={selectedSetting!}
                     />
                 )}
-                {showAddModal && <AddPluginModal setShowModal={setShowAddModal} />}
+                {showAddModal && (
+                    <AddPluginModal
+                        // eslint-disable-next-line
+                        setShowModal={(toggle: boolean = false): void => {
+                            setShowAddModal(toggle);
+                            getSettings();
+                        }}
+                    />
+                )}
             </Box>
         );
     }
