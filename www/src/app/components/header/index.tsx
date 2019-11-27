@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
-import { Box, Button, DropButton, Heading, TextInput, Text } from 'grommet';
+import { Box, Button, DropButton, Heading, Text } from 'grommet';
 import { User, Notification, Configure, Github } from 'grommet-icons';
 import { useHistory } from 'react-router';
 import Logo from '../logo';
@@ -47,7 +47,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                     <Button onClick={(): void => history.push('/tasker/admin/tasks')}>Tasks</Button>
                 </Box>
                 <Box direction="row" alignSelf="end" align="center">
-                    <TextInput height="50px" style={{ width: '300px' }} />
+                    {/* <TextInput height="50px" style={{ width: '300px' }} /> */}
                     <Button icon={<Configure />} onClick={(): void => history.push('/tasker/admin/settings')} />
                     <DropButton
                         id="header-notification-btn"
@@ -82,10 +82,12 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                                 width="200px"
                                 height="200px"
                                 align="center"
+                                justify="between"
                                 direction="column"
                             >
                                 <Heading level="5">Roger King</Heading>
                                 <Button
+                                    margin="small"
                                     icon={<Github />}
                                     label="Profile"
                                     color="brand"
