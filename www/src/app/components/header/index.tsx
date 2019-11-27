@@ -88,7 +88,6 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                                 <Button
                                     icon={<Github />}
                                     label="Profile"
-                                    style={{ borderRadius: '7px' }}
                                     color="brand"
                                     primary
                                     onClick={(): void => {

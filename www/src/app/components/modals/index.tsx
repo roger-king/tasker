@@ -2,8 +2,11 @@ import React from 'react';
 import { Box, Layer, Button, Heading } from 'grommet';
 import { Close } from 'grommet-icons';
 
-interface ModalProps {
+export interface BaseModalProps {
     setShowModal: any;
+}
+
+interface ModalProps extends BaseModalProps {
     header: string;
     width: any;
     onClickOutside: boolean;

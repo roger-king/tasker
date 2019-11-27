@@ -228,12 +228,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                                     required
                                 />
                             </FormField>
-                            <Button
-                                label="Next"
-                                onClick={(): void => onNext()}
-                                style={{ borderRadius: '7px' }}
-                                disabled={disableNext}
-                            />
+                            <Button label="Next" onClick={(): void => onNext()} disabled={disableNext} />
                         </Box>
                     ) : (
                         <Box fill gap="small">
@@ -244,12 +239,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                                 onChange={(): void => setIsRepeating(!isRepeating)}
                                 label="Repeating?"
                             />
-                            <Button
-                                label="Create"
-                                style={{ borderRadius: '7px' }}
-                                disabled={disableCreate}
-                                onClick={(): Promise<void> => create()}
-                            />
+                            <Button label="Create" disabled={disableCreate} onClick={(): Promise<void> => create()} />
                         </Box>
                     )}
                 </Box>

@@ -18,6 +18,11 @@ export const theme: ThemeType = {
             family: 'Lato, sans-serif',
         },
     },
+    button: {
+        border: {
+            radius: '7px',
+        },
+    },
     heading: {
         font: {
             family: 'Viga, sans-serif',
@@ -42,22 +47,6 @@ export const theme: ThemeType = {
         },
     },
     checkBox: {
-        border: {
-            color: {
-                light: 'toggle-bg',
-            },
-        },
-        color: {
-            light: 'toggle-knob',
-        },
-        check: {
-            radius: '2px',
-        },
-        hover: {
-            border: {
-                color: undefined,
-            },
-        },
         toggle: {
             background: { light: 'toggle-accent' },
             color: {
@@ -71,7 +60,7 @@ export const theme: ThemeType = {
                  0px 2px 2px 0px rgba(0,0,0,0.24);
               `,
             },
-            extend: ({ checked }) => `
+            extend: ({ checked }): string => `
               height: 14px;
               ${checked &&
                   css`
