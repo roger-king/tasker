@@ -49,7 +49,7 @@ func (s *SettingService) ListPluginSettings() ([]*models.PluginSetting, error) {
 	options := options.Find()
 	options.SetSort(bson.D{{"executor", 1}})
 
-	cur, err := s.Collection.Find(ctx, bson.M{}, options)
+	cur, err := s.Collection.Find(ctx, bson.M{"type": "plugin"}, options)
 
 	if err != nil {
 		return nil, err
@@ -70,4 +70,30 @@ func (s *SettingService) ListPluginSettings() ([]*models.PluginSetting, error) {
 	}
 
 	return settings, nil
+}
+
+func (s *SettingService) FindPluginSettingByRepo(repoName string) (*models.PluginSetting, error) {
+	var pluginSetting models.PluginSetting
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+	err := s.Collection.FindOne(ctx, bson.M{"repo_name": repoName}).Decode(&pluginSetting)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &pluginSetting, nil
+}
+
+func (s *SettingService) ToggleActiveSettingPluginRepo(toggleInput *models.ToggleActiveSetting) error {
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	_, err := s.Collection.UpdateOne(ctx, bson.M{"repo_name": toggleInput.RepoName}, bson.M{"$set": bson.M{"active": toggleInput.Active}})
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

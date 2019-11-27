@@ -28,6 +28,7 @@ func NewRouter(taskService *services.TaskService, settingService *services.Setti
 	// Setting Routes
 	apiRouter.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
 	apiRouter.HandleFunc("/settings/plugin", CreatePluginSetting(settingService)).Methods("POST")
+	apiRouter.HandleFunc("/settings/plugin/toggle", ToggleActiveRepository(settingService)).Methods("PATCH")
 
 	// Web Admin - We have a reverse proxy for working on local developer :)
 	r.PathPrefix("/static/").HandlerFunc(ServeWebAdmin)

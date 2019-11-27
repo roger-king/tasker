@@ -13,3 +13,8 @@ type PluginSetting struct {
 func (p PluginSetting) BeforeCreate() {
 	return
 }
+
+type ToggleActiveSetting struct {
+	RepoName string `json:"repo_name"`
+	Active   bool   `json:"active"`
+}

@@ -46,3 +46,25 @@ func CreatePluginSetting(s *services.SettingService) http.HandlerFunc {
 		return
 	}
 }
+
+func ToggleActiveRepository(s *services.SettingService) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		var input models.ToggleActiveSetting
+		decoder := json.NewDecoder(r.Body)
+
+		if err := decoder.Decode(&input); err != nil {
+			respondWithError(w, http.StatusInternalServerError, utils.RequestError, err.Error())
+			return
+		}
+
+		err := s.ToggleActiveSettingPluginRepo(&input)
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
+			return
+		}
+
+		respondWithJSON(w, http.StatusOK, true)
+		return
+	}
+}
