@@ -72,7 +72,7 @@ class HomePage extends React.PureComponent<HomePageProps, HomePageState> {
         this.setState({ showModal: !showModal });
     };
 
-    renderBody = () => {
+    renderBody = (): JSX.Element => {
         const { currentCategory, categories, tasks, filteredTasks, isLoading } = this.state;
         if (isLoading) {
             return <Box>loading...</Box>;

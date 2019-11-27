@@ -91,7 +91,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                                     style={{ borderRadius: '7px' }}
                                     color="brand"
                                     primary
-                                    onClick={() => {
+                                    onClick={(): void => {
                                         console.log('go to profile');
                                     }}
                                 />

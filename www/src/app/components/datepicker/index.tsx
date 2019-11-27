@@ -14,8 +14,8 @@ const DatePicker: React.FC<DatePickerProps> = (props: DatePickerProps) => {
     return (
         <DropButton
             open={showCalendar}
-            onClose={() => setShowCalendar(false)}
-            onOpen={() => setShowCalendar(true)}
+            onClose={(): void => setShowCalendar(false)}
+            onOpen={(): void => setShowCalendar(true)}
             dropAlign={{ top: 'bottom', right: 'right' }}
             dropContent={<Calendar date={date} onSelect={onSelect} size="small" />}
         >

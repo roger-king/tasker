@@ -17,7 +17,7 @@ const CronInput: React.FC<CronInputProps> = (props: CronInputProps): JSX.Element
         dayOfWeek: '*',
     });
 
-    const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
         const { name, value } = e.target;
         setCronTab({ ...cronTab, [name]: value });
     };

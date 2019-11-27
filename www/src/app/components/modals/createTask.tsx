@@ -127,13 +127,12 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     /* eslint-disable-next-line @typescript-eslint/no-unused-vars  */
     const [disableCreate, setDisableCreate] = useState<boolean>(true);
 
-    const onDateSelect = (selectedDate: any) => {
-        console.log(selectedDate);
+    const onDateSelect = (selectedDate: any): void => {
         setCreateTaskInput({ ...createTaskInput, schedule: selectedDate });
         setShowCalendar(false);
     };
 
-    const onTimeSelect = (e: any) => {
+    const onTimeSelect = (e: any): void => {
         const { name } = e.target;
         setTime({ ...time, [name]: e.value });
     };
@@ -146,12 +145,15 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     };
 
     const onNext = (): void => {
-        setNext(true);
-        const selectedMonth = new Date(createTaskInput.schedule!).getMonth() + 1;
-        const selectedDayOfWeek = new Date(createTaskInput.schedule!).getDay();
-        const selectedDayOfMonth = new Date(createTaskInput.schedule!).getDate();
-        const cronTab = `${time.minute} ${time.hour} ${selectedDayOfMonth} ${selectedMonth} ${selectedDayOfWeek} `;
-        setCreateTaskInput({ ...createTaskInput, schedule: cronTab });
+        if (createTaskInput.schedule) {
+            const selectedMonth = new Date(createTaskInput.schedule).getMonth() + 1;
+            const selectedDayOfWeek = new Date(createTaskInput.schedule).getDay();
+            const selectedDayOfMonth = new Date(createTaskInput.schedule).getDate();
+            const cronTab = `${time.minute} ${time.hour} ${selectedDayOfMonth} ${selectedMonth} ${selectedDayOfWeek} `;
+            setCreateTaskInput({ ...createTaskInput, schedule: cronTab });
+            setNext(true);
+        }
+        console.error('cannot find schedule');
     };
 
     const create = async (): Promise<void> => {
@@ -170,7 +172,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     const shouldDisableNext = useCallback(() => {
         for (const key of Object.keys(createTaskInput)) {
             const k: NewTaskInputKey = key as NewTaskInputKey;
-            if (createTaskInput[k]!.length === 0) {
+            // eslint-disable-next-line
+            if (createTaskInput[k] && createTaskInput[k]!.length === 0) {
                 setDisableNext(true);
                 return;
             }
@@ -238,7 +241,7 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                             <ArgsFieldList args={args} setArgs={setArgs} />
                             <CheckBox
                                 checked={isRepeating}
-                                onChange={() => setIsRepeating(!isRepeating)}
+                                onChange={(): void => setIsRepeating(!isRepeating)}
                                 label="Repeating?"
                             />
                             <Button

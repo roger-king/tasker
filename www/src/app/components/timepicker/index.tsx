@@ -9,7 +9,7 @@ interface TimePickerProps {
     onChange(e: FormEvent<HTMLInputElement>): void;
 }
 
-const TimePicker: React.FC<TimePickerProps> = (props: TimePickerProps) => {
+const TimePicker: React.FC<TimePickerProps> = (props: TimePickerProps): JSX.Element => {
     const {
         onChange,
         time: { hour, minute },
@@ -25,8 +25,8 @@ const TimePicker: React.FC<TimePickerProps> = (props: TimePickerProps) => {
     return (
         <DropButton
             open={showPicker}
-            onClose={() => setShowPicker(false)}
-            onOpen={() => setShowPicker(true)}
+            onClose={(): void => setShowPicker(false)}
+            onOpen={(): void => setShowPicker(true)}
             dropAlign={{ top: 'bottom', left: 'left' }}
             dropContent={
                 <Box direction="row" width="300px">
