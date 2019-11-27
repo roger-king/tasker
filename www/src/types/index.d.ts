@@ -17,6 +17,11 @@ interface Setting {
     build_folder_name: string;
 }
 
+interface TogglePluginSetting {
+    repo_name: string;
+    active: boolean;
+}
+
 interface Task {
     taskId: string;
     entryId: number;

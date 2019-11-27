@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, Heading, Text, CheckBox, Table, TableRow, TableCell, TableBody, Button } from 'grommet';
 import { StatusInfo } from 'grommet-icons';
-import { listSettings } from '../../data/settings';
+import { listSettings, toggleActivePluginSetting } from '../../data/settings';
 import Modal from '../../components/modals';
 
 interface PluginInfoModalProps {
@@ -24,7 +24,7 @@ const PluginSettingPage: React.FC = () => {
     const [settings, setSettings] = useState<Setting[] | null>(null);
     const [error, setError] = useState<any>();
 
-    useEffect(() => {
+    const getSettings = () => {
         listSettings()
             .then(({ data }: { data: Setting[] | null }) => {
                 setLoading(false);
@@ -33,6 +33,10 @@ const PluginSettingPage: React.FC = () => {
             .catch((err: any) => {
                 setError(err);
             });
+    };
+
+    useEffect(() => {
+        getSettings();
     }, []);
 
     if (error) {
@@ -62,7 +66,14 @@ const PluginSettingPage: React.FC = () => {
                                             toggle
                                             checked={s.active}
                                             onChange={async (): Promise<void> => {
-                                                console.log('change me');
+                                                const done = await toggleActivePluginSetting({
+                                                    repo_name: s.repo_name,
+                                                    active: !s.active,
+                                                });
+
+                                                if (done) {
+                                                    getSettings();
+                                                }
                                             }}
                                         />
                                     </TableCell>
