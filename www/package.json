@@ -81,7 +81,6 @@
     },
     "lint-staged": {
         "src/**/*.{ts,tsx}": [
-            "CI=true npm run test",
             "npm run --silent lint:fix",
             "git add"
         ]
