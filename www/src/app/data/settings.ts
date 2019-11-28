@@ -1,5 +1,12 @@
-export const listSettings = async (): Promise<{ data: [Setting] }> => {
-    const data = await fetch(`/tasker/settings/plugin`);
+export const listSettings = async (filters: Map<string, string> = new Map()): Promise<{ data: [Setting] }> => {
+    let q = `?`;
+    if (filters.size > 0) {
+        filters.forEach((v: string, k: string) => {
+            q += `${k}=${v}&`;
+        });
+    }
+
+    const data = await fetch(`/tasker/settings/plugin${q}`);
     return data.json();
 };
 
