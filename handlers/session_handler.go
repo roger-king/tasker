@@ -9,7 +9,7 @@ import (
 
 func CheckSession() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		statusCode := checkCookie(w, r)
+		statusCode, _ := checkCookie(w, r)
 
 		if statusCode != 200 {
 			respondWithError(w, statusCode, utils.ProcessingError, errors.New("Failed to validate"))
@@ -17,6 +17,15 @@ func CheckSession() http.HandlerFunc {
 		}
 
 		respondWithJSON(w, http.StatusOK, true)
+		return
+	}
+}
+
+func GetCurrentUser() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user := getCurrentUser(r.Context())
+
+		respondWithJSON(w, http.StatusOK, user)
 		return
 	}
 }

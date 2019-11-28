@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/dgrijalva/jwt-go"
@@ -8,16 +9,18 @@ import (
 	"github.com/roger-king/tasker/utils"
 )
 
-func checkCookie(w http.ResponseWriter, r *http.Request) int {
+type ContextKey string
+
+func checkCookie(w http.ResponseWriter, r *http.Request) (int, *models.UserClaims) {
 	cookie, err := r.Cookie("tasker-user")
 
 	if err != nil {
 		if err == http.ErrNoCookie {
 			// If the cookie is not set, return an unauthorized status
-			return http.StatusUnauthorized
+			return http.StatusUnauthorized, nil
 		}
 		// For any other type of error, return a bad request status
-		return http.StatusBadRequest
+		return http.StatusBadRequest, nil
 	}
 
 	tknStr := cookie.Value
@@ -35,26 +38,42 @@ func checkCookie(w http.ResponseWriter, r *http.Request) int {
 
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
-			return http.StatusUnauthorized
+			return http.StatusUnauthorized, nil
 		}
-		return http.StatusBadRequest
+		return http.StatusBadRequest, nil
 	}
 
 	if !tkn.Valid {
-		return http.StatusUnauthorized
+		return http.StatusUnauthorized, nil
 	}
-	return http.StatusOK
+
+	// Adding user to context
+
+	return http.StatusOK, claims
+}
+
+func getCurrentUser(ctx context.Context) *models.User {
+	userCtx := ctx.Value(ContextKey("user"))
+
+	if userCtx != nil {
+		user := userCtx.(models.User)
+		return &user
+	}
+
+	return nil
 }
 
 func authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		statusCode := checkCookie(w, r)
+		statusCode, userClaims := checkCookie(w, r)
 
 		if statusCode != 200 {
 			http.Error(w, "unauthorized request", statusCode)
 			return
 		}
 
-		next.ServeHTTP(w, r)
+		ctx := context.WithValue(r.Context(), ContextKey("user"), userClaims.User)
+
+		next.ServeHTTP(w, r.WithContext(ctx))
 	})
 }
