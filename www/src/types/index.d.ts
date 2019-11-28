@@ -1,6 +1,11 @@
 type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 type Optionalize<T extends K, K> = Omit<T, keyof K>;
 
+interface TaskerNotification {
+    type: 'success' | 'warn' | 'fail';
+    title: string;
+    body: string;
+}
 interface User {
     username: string;
     name: string;

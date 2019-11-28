@@ -48,6 +48,7 @@ const RouterContainer: React.FC<{}> = (): JSX.Element => {
     /* eslint-disable-next-line */
     const [showNotification, setShowNotification] = useState<boolean>(false);
     const [UserStore, setUserStore] = useState<React.Context<User> | null>(null);
+    const notification: TaskerNotification = { type: 'success', body: '', title: '' };
 
     useEffect(() => {
         UserContext().then(ctx => {
@@ -61,7 +62,7 @@ const RouterContainer: React.FC<{}> = (): JSX.Element => {
 
     return (
         <UserStore.Consumer>
-            {(user: User) => (
+            {(user: User): JSX.Element => (
                 <Grid
                     fill
                     rows={['auto', 'flex']}
@@ -95,7 +96,7 @@ const RouterContainer: React.FC<{}> = (): JSX.Element => {
                             component={TaskPage}
                         />
                     </Box>
-                    {showNotification && <Notification type="success" />}
+                    {showNotification && <Notification msg={notification} />}
                 </Grid>
             )}
         </UserStore.Consumer>
