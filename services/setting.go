@@ -42,14 +42,33 @@ func (s *SettingService) CreatePluginSetting(input *models.PluginSetting) (*mode
 	return input, nil
 }
 
-func (s *SettingService) ListPluginSettings() ([]*models.PluginSetting, error) {
+func (s *SettingService) ListPluginSettings(filters map[string]interface{}) ([]*models.PluginSetting, error) {
 	var settings []*models.PluginSetting
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	var docFilters bson.M
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 	defer cancel()
-	options := options.Find()
-	options.SetSort(bson.D{{"executor", 1}})
 
-	cur, err := s.Collection.Find(ctx, bson.M{"type": "plugin"}, options)
+	options := options.Find()
+	options.SetSort(bson.D{{"repo_name", 1}})
+
+	if _, ok := filters["skip"]; ok {
+		if filters["skip"].(int64) > 0 {
+			options.SetSkip(filters["skip"].(int64))
+			delete(filters, "skip")
+		}
+	}
+
+	bFilters, err := bson.Marshal(&filters)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if err := bson.Unmarshal(bFilters, &docFilters); err != nil {
+		return nil, err
+	}
+
+	cur, err := s.Collection.Find(ctx, docFilters, options)
 
 	if err != nil {
 		return nil, err

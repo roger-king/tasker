@@ -3,16 +3,39 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
+	"github.com/sirupsen/logrus"
 )
 
 // ListPluginSetting -
 func ListPluginSetting(s *services.SettingService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		settings, err := s.ListPluginSettings()
+		queries := r.URL.Query()
+
+		// Default type of plugin
+		filters := map[string]interface{}{
+			"type": "plugin",
+		}
+
+		if len(queries) > 0 {
+			if len(queries["active"]) > 0 {
+				boolean, _ := strconv.ParseBool(queries["active"][0])
+				filters["active"] = boolean
+			}
+
+			if len(queries["skip"]) > 0 {
+				i, _ := strconv.ParseInt(queries["skip"][0], 10, 64)
+				filters["skip"] = i
+			}
+		}
+
+		logrus.Info(filters)
+
+		settings, err := s.ListPluginSettings(filters)
 
 		if err != nil {
 			respondWithError(w, http.StatusInternalServerError, "", err.Error())

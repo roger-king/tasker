@@ -26,7 +26,7 @@ func NewRouter(taskService *services.TaskService, settingService *services.Setti
 	apiRouter.HandleFunc("/tasks/{taskID}", DeleteTask(taskService)).Methods("DELETE")
 
 	// Setting Routes
-	apiRouter.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
+	r.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
 	apiRouter.HandleFunc("/settings/plugin", CreatePluginSetting(settingService)).Methods("POST")
 	apiRouter.HandleFunc("/settings/plugin/toggle", ToggleActiveRepository(settingService)).Methods("PATCH")
 
