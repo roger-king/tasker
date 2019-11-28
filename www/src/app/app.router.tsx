@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Route, Redirect, RouteProps } from 'react-router-dom';
 import { Box, Grid } from 'grommet';
 import { TasksPage, OverviewPage, SettingsPage, TaskPage } from './pages';
-import { check } from './data/auth';
+import { check, me } from './data/auth';
 import { REDIRECT_URL } from './app.constants';
 import Header from './components/header';
 import Notification from './components/notification';
@@ -47,59 +47,53 @@ const defaultProtectedRouteProps: ProtectedRouteProps = {
 const RouterContainer: React.FC<{}> = (): JSX.Element => {
     /* eslint-disable-next-line */
     const [showNotification, setShowNotification] = useState<boolean>(false);
-    const [UserStore, setUserStore] = useState<React.Context<User> | null>(null);
     const notification: TaskerNotification = { type: 'success', body: '', title: '' };
+    const [user, setUser] = useState<User>({ username: '', name: '', email: '', githubURL: '', bio: '' });
 
     useEffect(() => {
-        UserContext().then(ctx => {
-            setUserStore(ctx);
-        });
+        me()
+            .then(({ data }) => {
+                setUser({ ...data });
+            })
+            .catch((err: any) => {
+                console.error(err);
+            });
     }, []);
 
-    if (UserStore === null) {
-        return <Box />;
-    }
-
     return (
-        <UserStore.Consumer>
-            {(user: User): JSX.Element => (
-                <Grid
-                    fill
-                    rows={['auto', 'flex']}
-                    columns={['auto', 'flex']}
-                    areas={[
-                        { name: 'header', start: [0, 0], end: [1, 0] },
-                        { name: 'main', start: [1, 1], end: [1, 1] },
-                    ]}
-                >
-                    <Header gridArea="header" user={user} />
-                    <Box gridArea="main" fill>
-                        <ProtectedRoute
-                            {...defaultProtectedRouteProps}
-                            exact
-                            path="/tasker/admin"
-                            component={OverviewPage}
-                        />
-                        <ProtectedRoute
-                            {...defaultProtectedRouteProps}
-                            path="/tasker/admin/tasks"
-                            component={TasksPage}
-                        />
-                        <ProtectedRoute
-                            {...defaultProtectedRouteProps}
-                            path="/tasker/admin/settings"
-                            component={SettingsPage}
-                        />
-                        <ProtectedRoute
-                            {...defaultProtectedRouteProps}
-                            path="/tasker/admin/task/:id"
-                            component={TaskPage}
-                        />
-                    </Box>
-                    {showNotification && <Notification msg={notification} />}
-                </Grid>
-            )}
-        </UserStore.Consumer>
+        <UserContext.Provider value={user}>
+            <Grid
+                fill
+                rows={['auto', 'flex']}
+                columns={['auto', 'flex']}
+                areas={[
+                    { name: 'header', start: [0, 0], end: [1, 0] },
+                    { name: 'main', start: [1, 1], end: [1, 1] },
+                ]}
+            >
+                <Header gridArea="header" />
+                <Box gridArea="main" fill>
+                    <ProtectedRoute
+                        {...defaultProtectedRouteProps}
+                        exact
+                        path="/tasker/admin"
+                        component={OverviewPage}
+                    />
+                    <ProtectedRoute {...defaultProtectedRouteProps} path="/tasker/admin/tasks" component={TasksPage} />
+                    <ProtectedRoute
+                        {...defaultProtectedRouteProps}
+                        path="/tasker/admin/settings"
+                        component={SettingsPage}
+                    />
+                    <ProtectedRoute
+                        {...defaultProtectedRouteProps}
+                        path="/tasker/admin/task/:id"
+                        component={TaskPage}
+                    />
+                </Box>
+                {showNotification && <Notification msg={notification} />}
+            </Grid>
+        </UserContext.Provider>
     );
 };
 

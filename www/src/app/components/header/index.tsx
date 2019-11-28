@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styled from 'styled-components';
 import { Box, Button, DropButton, Heading, Text } from 'grommet';
 import { User, Notification, Configure, Github } from 'grommet-icons';
 import { useHistory } from 'react-router';
 import Logo from '../logo';
+import { UserContext } from '../../contexts/user';
 
 interface HeaderProps {
     className?: string;
     gridArea: string;
-    user: User;
 }
 
 const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
-    const { gridArea, user } = props;
+    const { gridArea } = props;
     const [notifcations, setNotifications] = useState<any[]>([]);
     const history = useHistory();
+    const user = useContext(UserContext);
 
     useEffect(() => {
         setNotifications([]);

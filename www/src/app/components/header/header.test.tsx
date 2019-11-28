@@ -8,19 +8,11 @@ import Header from './index';
 Enzyme.configure({ adapter: new Adapter() });
 
 describe('<Header />', () => {
-    const user: User = {
-        name: 'Steve Rogers',
-        email: 'steve.rogers@avengers.org',
-        githubURL: 'https://github.com/steve-rogers',
-        username: 'steve-rogers',
-        bio: 'The first avenger',
-    };
-
     it('Matches the snapshot', () => {
         const header = renderer
             .create(
                 <MemoryRouter>
-                    <Header gridArea="header" user={user} />
+                    <Header gridArea="header" />
                 </MemoryRouter>,
             )
             .toJSON();
