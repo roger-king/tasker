@@ -22,8 +22,6 @@ const CronInput: React.FC<CronInputProps> = (props: CronInputProps): JSX.Element
         setCronTab({ ...cronTab, [name]: value });
     };
 
-    console.log(cronTab);
-
     return (
         <Box className={className} direction="row" gap="small">
             <Box className="cron-box">

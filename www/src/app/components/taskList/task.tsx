@@ -1,6 +1,6 @@
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Box, Button, DropButton, CheckBox, Heading, Text, ResponsiveContext } from 'grommet';
+import { Box, Button, DropButton, CheckBox, Heading, Text } from 'grommet';
 import { MoreVertical } from 'grommet-icons';
 import { useHistory } from 'react-router';
 import DeleteTaskModal from '../modals/delete';
@@ -19,9 +19,7 @@ const Task: React.FC<TaskProps> = (props: TaskProps): JSX.Element => {
     const completeText = complete ? 'Completed' : 'Not Executed';
     const [showModal, setShowModal] = useState<boolean>(false);
     const history = useHistory();
-    const size = useContext(ResponsiveContext);
-
-    console.log(size);
+    //    const size = useContext(ResponsiveContext);
 
     return (
         <Box

@@ -27,3 +27,8 @@ export const check = async (): Promise<boolean> => {
 
     return true;
 };
+
+export const me = async (): Promise<{ data: User }> => {
+    const data = await fetch('/tasker/me');
+    return data.json();
+};

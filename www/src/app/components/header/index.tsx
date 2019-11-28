@@ -8,10 +8,11 @@ import Logo from '../logo';
 interface HeaderProps {
     className?: string;
     gridArea: string;
+    user: User;
 }
 
 const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
-    const { gridArea } = props;
+    const { gridArea, user } = props;
     const [notifcations, setNotifications] = useState<any[]>([]);
     const history = useHistory();
 
@@ -85,7 +86,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                                 justify="between"
                                 direction="column"
                             >
-                                <Heading level="5">Roger King</Heading>
+                                <Heading level="5">{user.name}</Heading>
                                 <Button
                                     margin="small"
                                     icon={<Github />}
@@ -93,7 +94,7 @@ const Header: React.FC<HeaderProps> = (props: HeaderProps): JSX.Element => {
                                     color="brand"
                                     primary
                                     onClick={(): void => {
-                                        console.log('go to profile');
+                                        window.open(user.githubURL, '_newtab');
                                     }}
                                 />
                             </Box>
