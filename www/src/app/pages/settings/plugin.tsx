@@ -20,7 +20,8 @@ const PluginSettingPage: React.FC = () => {
                 setSettings(data);
             })
             .catch((err: any) => {
-                setError(err);
+                console.error(err);
+                setError('An error occured fetching for settings');
             });
     };
 
