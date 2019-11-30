@@ -4,45 +4,46 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/google/wire"
 	"github.com/gorilla/mux"
-	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func NewRouter(taskService *services.TaskService, settingService *services.SettingService, github *services.GithubAuthService, db *mongo.Client) *mux.Router {
+var RouterSet = wire.NewSet(NewRouter)
+
+func NewRouter() *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/check", CheckSession()).Methods("GET")
 
-	apiRouter := r.PathPrefix("/tasker").Subrouter()
-	apiRouter.Use(authMiddleware)
-	apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
-	apiRouter.HandleFunc("/tasks", CreateTask(taskService)).Methods("POST")
+	// apiRouter := r.PathPrefix("/tasker").Subrouter()
+	// apiRouter.Use(authMiddleware)
+	// apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
+	// apiRouter.HandleFunc("/tasks", CreateTask(taskService)).Methods("POST")
 
-	// Single Task Routes
-	apiRouter.HandleFunc("/tasks/{taskID}", FindTask(taskService)).Methods("GET")
-	apiRouter.HandleFunc("/tasks/{taskID}/disable", DisableTask(taskService)).Methods("PATCH")
-	apiRouter.HandleFunc("/tasks/{taskID}", DeleteTask(taskService)).Methods("DELETE")
+	// // Single Task Routes
+	// apiRouter.HandleFunc("/tasks/{taskID}", FindTask(taskService)).Methods("GET")
+	// apiRouter.HandleFunc("/tasks/{taskID}/disable", DisableTask(taskService)).Methods("PATCH")
+	// apiRouter.HandleFunc("/tasks/{taskID}", DeleteTask(taskService)).Methods("DELETE")
 
-	// Setting Routes
-	apiRouter.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
-	apiRouter.HandleFunc("/settings/plugin", CreatePluginSetting(settingService)).Methods("POST")
-	apiRouter.HandleFunc("/settings/plugin/toggle", ToggleActiveRepository(settingService)).Methods("PATCH")
+	// // Setting Routes
+	// apiRouter.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
+	// apiRouter.HandleFunc("/settings/plugin", CreatePluginSetting(settingService)).Methods("POST")
+	// apiRouter.HandleFunc("/settings/plugin/toggle", ToggleActiveRepository(settingService)).Methods("PATCH")
 
-	// User Route
-	apiRouter.HandleFunc("/me", GetCurrentUser()).Methods("GET")
+	// // User Route
+	// apiRouter.HandleFunc("/me", GetCurrentUser()).Methods("GET")
 
-	// Web Admin - We have a reverse proxy for working on local developer :)
-	r.PathPrefix("/static/").HandlerFunc(ServeWebAdmin)
-	r.PathPrefix("/images/").HandlerFunc(ServeWebAdmin)
-	r.PathPrefix("/tasker/admin").HandlerFunc(ServeWebAdmin)
+	// // Web Admin - We have a reverse proxy for working on local developer :)
+	// r.PathPrefix("/static/").HandlerFunc(ServeWebAdmin)
+	// r.PathPrefix("/images/").HandlerFunc(ServeWebAdmin)
+	// r.PathPrefix("/tasker/admin").HandlerFunc(ServeWebAdmin)
 
-	// authenticate route
-	// Public routes for github access
-	oauth := r.PathPrefix("/oauth").Subrouter()
-	oauth.HandleFunc("/authenticate/{code}", LoginHandler(github, db)).Methods("POST")
-	oauth.HandleFunc("/github/user", FetchUserClientIDHandler(github)).Methods("GET")
+	// // authenticate route
+	// // Public routes for github access
+	// oauth := r.PathPrefix("/oauth").Subrouter()
+	// oauth.HandleFunc("/authenticate/{code}", LoginHandler(github, db)).Methods("POST")
+	// oauth.HandleFunc("/github/user", FetchUserClientIDHandler(github)).Methods("GET")
 
 	return r
 }

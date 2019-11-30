@@ -14,6 +14,10 @@ type TaskService struct {
 	Scheduler *cron.Cron
 }
 
+func NewTaskService() {
+
+}
+
 func (t *TaskService) List() ([]*models.Task, error) {
 	m := NewMongoService(t.DB)
 

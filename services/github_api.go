@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/google/go-github/v28/github"
+	"github.com/roger-king/tasker/utils"
 	"golang.org/x/oauth2"
 )
 
@@ -34,4 +35,12 @@ func (g *GithubAPIService) GetUser() (*github.User, error) {
 	}
 
 	return user, nil
+}
+
+func (g *GithubAPIService) DownloadTaggedAssets() {
+	err := utils.DownloadZip(".", "https://github.com/roger-king/tasker-plugin-example/releases/download/v1.0.0/build.zip")
+
+	if err != nil {
+		return
+	}
 }
