@@ -4,13 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/google/wire"
 	"github.com/gorilla/mux"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func NewRouter(taskService *services.TaskService, settingService *services.SettingService, github *services.GithubAuthService, db *mongo.Client) *mux.Router {
+var RouterSet = wire.NewSet(NewRouter)
+
+func NewRouter(taskService *services.TaskService, settingService *services.SettingService, gh *services.GithubAuthService, db *mongo.Client) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/check", CheckSession()).Methods("GET")
@@ -41,8 +44,8 @@ func NewRouter(taskService *services.TaskService, settingService *services.Setti
 	// authenticate route
 	// Public routes for github access
 	oauth := r.PathPrefix("/oauth").Subrouter()
-	oauth.HandleFunc("/authenticate/{code}", LoginHandler(github, db)).Methods("POST")
-	oauth.HandleFunc("/github/user", FetchUserClientIDHandler(github)).Methods("GET")
+	oauth.HandleFunc("/authenticate/{code}", LoginHandler(gh, db)).Methods("POST")
+	oauth.HandleFunc("/github/user", FetchUserClientIDHandler(gh)).Methods("GET")
 
 	return r
 }

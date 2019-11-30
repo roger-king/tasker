@@ -1,15 +1,23 @@
 package main
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/roger-king/tasker"
+	tm "github.com/roger-king/tasker/models"
 )
 
 func main() {
-	t := tasker.New(&tasker.TaskerConfig{
-		MongoConnectionURL: "mongodb://appuser:appuser@localhost:27017/tasker?authSource=admin",
+	t, err := tasker.New(tm.TaskerConfig{
+		Type:               "mongo",
+		MongoConnectionURL: tm.MongoConnectionURL("mongodb://appuser:appuser@localhost:27017/tasker?authSource=admin"),
 	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
 	router := t.Start()
 
 	http.Handle("/", router)

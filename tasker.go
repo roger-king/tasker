@@ -1,12 +1,17 @@
+// +build wireinject
+// The build tag makes sure the stub is not built in the final build.
+
 package tasker
 
 import (
 	"os"
 
+	"github.com/google/wire"
 	"github.com/gorilla/mux"
 	_ "github.com/joho/godotenv/autoload"
 	cron "github.com/robfig/cron/v3"
 	"github.com/roger-king/tasker/handlers"
+	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -14,12 +19,10 @@ import (
 
 // Tasker -
 type Tasker struct {
+	Config    models.TaskerConfig
 	DB        *mongo.Client
 	Scheduler *cron.Cron
-}
-
-type TaskerConfig struct {
-	MongoConnectionURL string `required:"true"`
+	Router    *mux.Router
 }
 
 func init() {
@@ -34,18 +37,24 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 }
 
-// New - Creates a new instance of tasker
-func New(tc *TaskerConfig) *Tasker {
-	m, err := services.NewMongoConnection(tc.MongoConnectionURL)
+var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProvideCron, ProivdeTasker)
 
-	if err != nil {
-		log.Panic(err)
-	}
+func ProvideCron() *cron.Cron {
+	return cron.New()
+}
 
+func ProivdeTasker(tc models.TaskerConfig, r *mux.Router, c *cron.Cron) *Tasker {
 	return &Tasker{
-		Scheduler: cron.New(),
-		DB:        m,
+		Config:    tc,
+		Scheduler: c,
+		Router:    r,
 	}
+}
+
+// New - Creates a new instance of tasker
+func New(tc models.TaskerConfig) (*Tasker, error) {
+	wire.Build(TaskerSet)
+	return nil, nil
 }
 
 // Start - returns a mux router instance
@@ -53,14 +62,5 @@ func (t *Tasker) Start() *mux.Router {
 	log.Info("Starting Tasker application")
 	t.Scheduler.Start()
 
-	taskService := &services.TaskService{
-		DB:        t.DB,
-		Scheduler: t.Scheduler,
-	}
-
-	settingService := services.NewSettingService(t.DB)
-	githubService := services.NewGithubAuthService()
-
-	r := handlers.NewRouter(taskService, settingService, githubService, t.DB)
-	return r
+	return t.Router
 }

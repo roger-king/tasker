@@ -2,6 +2,7 @@ DOCKER_TARGET?=ci
 
 setup:
 	go mod vendor
+	go generate
 
 dev:
 	go run example/main.go
@@ -13,5 +14,8 @@ cleanup:
 test:
 	go test -v github.com/roger-king/tasker/...
 
+wire:
+	go generate
+	
 default:
 	setup
