@@ -8,16 +8,15 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 
+	"github.com/roger-king/tasker/models"
 	log "github.com/sirupsen/logrus"
 )
 
-type MongoConnectionString string
-
 // NewMongoConnection - creates a MongoConnection instance
-func NewMongoConnection(c MongoConnectionString) (*mongo.Client, error) {
+func NewMongoConnection(tc models.TaskerConfig) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(c))
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(string(tc.MongoConnectionURL)))
 
 	if err != nil {
 		log.Fatal(err)

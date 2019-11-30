@@ -10,6 +10,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron/v3"
 	"github.com/roger-king/tasker/handlers"
+	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -22,7 +23,7 @@ import (
 
 // Injectors from tasker.go:
 
-func New(tc TaskerConfig) *Tasker {
+func New(tc models.TaskerConfig) *Tasker {
 	router := handlers.NewRouter()
 	tasker := ProivdeTasker(tc, router)
 	return tasker
@@ -30,21 +31,12 @@ func New(tc TaskerConfig) *Tasker {
 
 // tasker.go:
 
-type MongoConnectionURL string
-
-type DBType string
-
 // Tasker -
 type Tasker struct {
-	Config    TaskerConfig
+	Config    models.TaskerConfig
 	DB        *mongo.Client
 	Scheduler *cron.Cron
 	Router    *mux.Router
-}
-
-type TaskerConfig struct {
-	Type               DBType             `required:"true"`
-	MongoConnectionURL MongoConnectionURL `required:"true"`
 }
 
 func init() {
@@ -55,7 +47,7 @@ func init() {
 
 var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProivdeTasker)
 
-func ProivdeTasker(tc TaskerConfig, r *mux.Router) *Tasker {
+func ProivdeTasker(tc models.TaskerConfig, r *mux.Router) *Tasker {
 	return &Tasker{
 		Config: tc,
 		Router: r,
