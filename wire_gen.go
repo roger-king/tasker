@@ -23,10 +23,18 @@ import (
 
 // Injectors from tasker.go:
 
-func New(tc models.TaskerConfig) *Tasker {
-	router := handlers.NewRouter()
-	tasker := ProivdeTasker(tc, router)
-	return tasker
+func New(tc models.TaskerConfig) (*Tasker, error) {
+	client, err := services.NewMongoConnection(tc)
+	if err != nil {
+		return nil, err
+	}
+	cron := ProvideCron()
+	taskService := services.NewTaskService(client, cron)
+	settingService := services.NewSettingService(client)
+	githubAuthService := services.NewGithubAuthService()
+	router := handlers.NewRouter(taskService, settingService, githubAuthService, client)
+	tasker := ProivdeTasker(tc, router, cron)
+	return tasker, nil
 }
 
 // tasker.go:
@@ -45,12 +53,17 @@ func init() {
 	logrus.SetLevel(logrus.DebugLevel)
 }
 
-var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProivdeTasker)
+var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProvideCron, ProivdeTasker)
 
-func ProivdeTasker(tc models.TaskerConfig, r *mux.Router) *Tasker {
+func ProvideCron() *cron.Cron {
+	return cron.New()
+}
+
+func ProivdeTasker(tc models.TaskerConfig, r *mux.Router, c *cron.Cron) *Tasker {
 	return &Tasker{
-		Config: tc,
-		Router: r,
+		Config:    tc,
+		Scheduler: c,
+		Router:    r,
 	}
 }
 

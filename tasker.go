@@ -37,19 +37,24 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 }
 
-var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProivdeTasker)
+var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProvideCron, ProivdeTasker)
 
-func ProivdeTasker(tc models.TaskerConfig, r *mux.Router) *Tasker {
+func ProvideCron() *cron.Cron {
+	return cron.New()
+}
+
+func ProivdeTasker(tc models.TaskerConfig, r *mux.Router, c *cron.Cron) *Tasker {
 	return &Tasker{
-		Config: tc,
-		Router: r,
+		Config:    tc,
+		Scheduler: c,
+		Router:    r,
 	}
 }
 
 // New - Creates a new instance of tasker
-func New(tc models.TaskerConfig) *Tasker {
+func New(tc models.TaskerConfig) (*Tasker, error) {
 	wire.Build(TaskerSet)
-	return nil
+	return nil, nil
 }
 
 // Start - returns a mux router instance
