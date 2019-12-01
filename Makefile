@@ -7,6 +7,9 @@ setup:
 dev: wire
 	go run example/main.go
 
+web-dev:
+	cd www && BROWSER=none yarn start
+
 cleanup:
 	rm -rf ./build
 	rm -rf ./vendor

@@ -37,13 +37,6 @@ func CreateTask(t *services.TaskService, u *services.UserService) http.HandlerFu
 			return
 		}
 
-		tasks, err := t.Create(&input)
-
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
-			return
-		}
-
 		currUser := r.Context().Value(ContextKey("user")).(models.User)
 		foundUser, err := u.FindUser(currUser.UserName)
 
@@ -60,6 +53,13 @@ func CreateTask(t *services.TaskService, u *services.UserService) http.HandlerFu
 
 		gAPI := services.NewGithubAPIService(token)
 		gAPI.DownloadTaggedAssets()
+
+		tasks, err := t.Create(&input)
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
+			return
+		}
 
 		respondWithJSON(w, http.StatusOK, tasks)
 		return
