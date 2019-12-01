@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Box, Button, FormField, Heading, Layer, TextInput, CheckBox } from 'grommet';
+import { Box, Button, FormField, Heading, Layer, TextInput, CheckBox, Select } from 'grommet';
 import { Close, Add, Subtract } from 'grommet-icons';
 
 import { createTask } from '../../data/tasker';
+import { listSettings } from '../../data/settings';
 import DatePicker from '../datepicker';
 import TimePicker from '../timepicker';
 
@@ -125,6 +126,8 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     const [showCalendar, setShowCalendar] = useState<boolean>(false);
     const [disableNext, setDisableNext] = useState<boolean>(true);
     const [disableCreate, setDisableCreate] = useState<boolean>(true);
+    const [plugins, setPlugins] = useState<PluginSetting[]>();
+    const [selectedPlugin, setSelectedPlugin] = useState<string>('');
 
     const onDateSelect = (selectedDate: any): void => {
         setCreateTaskInput({ ...createTaskInput, schedule: selectedDate });
@@ -138,7 +141,17 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
 
     const onChange = (e: any): void => {
         const key = e.target.name;
-        const value = e.target.value;
+        let value = e.target.value;
+
+        if (key === 'plugin') {
+            setSelectedPlugin(value);
+            return;
+        }
+
+        if (key === 'executor') {
+            const oldValue = `${selectedPlugin}/${value}`;
+            value = oldValue;
+        }
 
         setCreateTaskInput({ ...createTaskInput, [key]: value });
     };
@@ -187,7 +200,19 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
             setDisableCreate(false);
         }
         shouldDisableNext();
+        listSettings()
+            .then(({ data }) => {
+                setPlugins(data);
+                setSelectedPlugin(data[0].repo_name);
+            })
+            .catch((err: any) => {
+                console.error(err);
+            });
     }, [args.length, createTaskInput, shouldDisableNext]);
+
+    if (!plugins) {
+        return <Box>loading...</Box>;
+    }
 
     return (
         <Layer modal onEsc={(): void => showModal()}>
@@ -221,14 +246,26 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
                                     <TimePicker onChange={onTimeSelect} time={time} />
                                 </Box>
                             </FormField>
-                            <FormField label="Executor">
-                                <TextInput
-                                    name="executor"
-                                    onChange={onChange}
-                                    value={createTaskInput.executor}
-                                    required
-                                />
-                            </FormField>
+                            <Box direction="row" gap="small">
+                                <FormField label="Plugin Repo">
+                                    <Select
+                                        name="plugin"
+                                        options={plugins!.map((p: PluginSetting) => p.repo_name)}
+                                        value={selectedPlugin}
+                                        onChange={onChange}
+                                    />
+                                </FormField>
+                                <FormField label="Executor">
+                                    <TextInput
+                                        name="executor"
+                                        placeholder="<script>@<tag>"
+                                        onChange={onChange}
+                                        value={createTaskInput.executor}
+                                        required
+                                    />
+                                </FormField>
+                            </Box>
+
                             <Button label="Next" onClick={(): void => onNext()} disabled={disableNext} />
                         </Box>
                     ) : (
