@@ -124,7 +124,6 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     const [args, setArgs] = useState<Argument[]>([{ key: '', value: '' }]);
     const [showCalendar, setShowCalendar] = useState<boolean>(false);
     const [disableNext, setDisableNext] = useState<boolean>(true);
-    /* eslint-disable-next-line @typescript-eslint/no-unused-vars  */
     const [disableCreate, setDisableCreate] = useState<boolean>(true);
 
     const onDateSelect = (selectedDate: any): void => {
@@ -170,14 +169,16 @@ const CreateTaskModal: React.FC<CreateTaskModalProps> = (props: CreateTaskModalP
     };
 
     const shouldDisableNext = useCallback(() => {
-        for (const key of Object.keys(createTaskInput)) {
+        const createTaskInputKeys = Object.keys(createTaskInput);
+        for (const key of createTaskInputKeys) {
             const k: NewTaskInputKey = key as NewTaskInputKey;
             // eslint-disable-next-line
-            if (createTaskInput[k] && createTaskInput[k]!.length === 0) {
+            if (createTaskInput[k]!.length === 0) {
                 setDisableNext(true);
                 return;
             }
         }
+
         setDisableNext(false);
     }, [createTaskInput]);
 
