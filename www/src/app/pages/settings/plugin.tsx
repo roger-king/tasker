@@ -9,13 +9,13 @@ const PluginSettingPage: React.FC = () => {
     const [loading, setLoading] = useState<boolean>(true);
     const [showInfoModal, setShowInfoModal] = useState<boolean>(false);
     const [showAddModal, setShowAddModal] = useState<boolean>(false);
-    const [settings, setSettings] = useState<Setting[] | null>(null);
-    const [selectedSetting, setSelectedSetting] = useState<Setting | null>(null);
+    const [settings, setSettings] = useState<PluginSetting[] | null>(null);
+    const [selectedSetting, setSelectedSetting] = useState<PluginSetting | null>(null);
     const [error, setError] = useState<any>();
 
     const getSettings = (): void => {
         listSettings()
-            .then(({ data }: { data: Setting[] | null }) => {
+            .then(({ data }: { data: PluginSetting[] | null }) => {
                 setLoading(false);
                 setSettings(data);
             })
@@ -49,7 +49,7 @@ const PluginSettingPage: React.FC = () => {
                     </Box>
                     <Table>
                         <TableBody>
-                            {settings.map((s: Setting) => (
+                            {settings.map((s: PluginSetting) => (
                                 <TableRow key={s.repo_name}>
                                     <TableCell border="bottom">
                                         <CheckBox

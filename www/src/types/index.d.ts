@@ -14,7 +14,7 @@ interface User {
     bio: string;
 }
 
-interface Setting {
+interface PluginSetting {
     type: string;
     active: boolean;
     description: string;

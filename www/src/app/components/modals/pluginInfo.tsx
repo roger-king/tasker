@@ -5,7 +5,7 @@ import Modal, { BaseModalProps } from './index';
 
 interface PluginInfoModalProps extends BaseModalProps {
     setSetting: any;
-    setting: Setting;
+    setting: PluginSetting;
 }
 
 const PluginInfoModal: React.FC<PluginInfoModalProps> = (props: PluginInfoModalProps) => {

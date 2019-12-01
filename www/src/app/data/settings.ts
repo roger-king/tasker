@@ -1,4 +1,4 @@
-export const listSettings = async (filters: Map<string, string> = new Map()): Promise<{ data: [Setting] }> => {
+export const listSettings = async (filters: Map<string, string> = new Map()): Promise<{ data: [PluginSetting] }> => {
     let q = `?`;
     if (filters.size > 0) {
         filters.forEach((v: string, k: string) => {
@@ -10,7 +10,7 @@ export const listSettings = async (filters: Map<string, string> = new Map()): Pr
     return data.json();
 };
 
-export const createSetting = async (input: Setting): Promise<{ data: Setting }> => {
+export const createSetting = async (input: PluginSetting): Promise<{ data: PluginSetting }> => {
     const data = await fetch(`/tasker/settings/plugin`, { method: 'POST', body: JSON.stringify(input) });
     return data.json();
 };
