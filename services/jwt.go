@@ -6,7 +6,6 @@ import (
 	"github.com/dgrijalva/jwt-go"
 	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/utils"
-	"github.com/sirupsen/logrus"
 )
 
 func GenerateJWTToken(user *models.User) (string, time.Time, error) {
@@ -25,8 +24,6 @@ func GenerateJWTToken(user *models.User) (string, time.Time, error) {
 			ExpiresAt: expirationTime.Unix(),
 		},
 	}
-
-	logrus.Info(claims.User.UserName)
 
 	jwtKey := []byte(utils.TaskerJWTSecret)
 

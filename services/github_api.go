@@ -5,6 +5,7 @@ import (
 
 	"github.com/google/go-github/v28/github"
 	"github.com/roger-king/tasker/utils"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/oauth2"
 )
 
@@ -41,6 +42,7 @@ func (g *GithubAPIService) DownloadTaggedAssets() {
 	err := utils.DownloadZip(".", "https://github.com/roger-king/tasker-plugin-example/releases/download/v1.0.0/build.zip")
 
 	if err != nil {
+		logrus.Error(err)
 		return
 	}
 }

@@ -13,7 +13,7 @@ import (
 
 var RouterSet = wire.NewSet(NewRouter)
 
-func NewRouter(taskService *services.TaskService, settingService *services.SettingService, gh *services.GithubAuthService, db *mongo.Client) *mux.Router {
+func NewRouter(userService *services.UserService, taskService *services.TaskService, settingService *services.SettingService, gh *services.GithubAuthService, db *mongo.Client) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/check", CheckSession()).Methods("GET")
@@ -21,7 +21,7 @@ func NewRouter(taskService *services.TaskService, settingService *services.Setti
 	apiRouter := r.PathPrefix("/tasker").Subrouter()
 	apiRouter.Use(authMiddleware)
 	apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
-	apiRouter.HandleFunc("/tasks", CreateTask(taskService)).Methods("POST")
+	apiRouter.HandleFunc("/tasks", CreateTask(taskService, userService)).Methods("POST")
 
 	// Single Task Routes
 	apiRouter.HandleFunc("/tasks/{taskID}", FindTask(taskService)).Methods("GET")

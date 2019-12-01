@@ -8,7 +8,6 @@ import (
 	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
-	"github.com/sirupsen/logrus"
 )
 
 // ListPluginSetting -
@@ -32,8 +31,6 @@ func ListPluginSetting(s *services.SettingService) http.HandlerFunc {
 				filters["skip"] = i
 			}
 		}
-
-		logrus.Info(filters)
 
 		settings, err := s.ListPluginSettings(filters)
 

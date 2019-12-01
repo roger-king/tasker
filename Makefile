@@ -4,7 +4,7 @@ setup:
 	go mod vendor
 	go generate
 
-dev:
+dev: wire
 	go run example/main.go
 
 cleanup:

@@ -27,7 +27,7 @@ func ListTasks(t *services.TaskService) http.HandlerFunc {
 }
 
 // CreateTask -
-func CreateTask(t *services.TaskService) http.HandlerFunc {
+func CreateTask(t *services.TaskService, u *services.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		var input models.NewInputTask
 		decoder := json.NewDecoder(r.Body)
@@ -43,6 +43,23 @@ func CreateTask(t *services.TaskService) http.HandlerFunc {
 			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
 			return
 		}
+
+		currUser := r.Context().Value(ContextKey("user")).(models.User)
+		foundUser, err := u.FindUser(currUser.UserName)
+
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "", err)
+			return
+		}
+
+		token, err := foundUser.GetAccessToken()
+		if err != nil {
+			respondWithError(w, http.StatusInternalServerError, "", err)
+			return
+		}
+
+		gAPI := services.NewGithubAPIService(token)
+		gAPI.DownloadTaggedAssets()
 
 		respondWithJSON(w, http.StatusOK, tasks)
 		return

@@ -13,6 +13,7 @@ import (
 	"github.com/roger-king/tasker/handlers"
 	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
+	"github.com/roger-king/tasker/utils"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -61,6 +62,8 @@ func New(tc models.TaskerConfig) (*Tasker, error) {
 func (t *Tasker) Start() *mux.Router {
 	log.Info("Starting Tasker application")
 	t.Scheduler.Start()
+
+	log.Info(utils.TaskerSecret)
 
 	return t.Router
 }

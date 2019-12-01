@@ -6,6 +6,8 @@
 package tasker
 
 import (
+	"os"
+
 	"github.com/google/wire"
 	"github.com/gorilla/mux"
 	"github.com/robfig/cron/v3"
@@ -14,10 +16,7 @@ import (
 	"github.com/roger-king/tasker/services"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
-	"os"
-)
 
-import (
 	_ "github.com/joho/godotenv/autoload"
 )
 
@@ -28,11 +27,12 @@ func New(tc models.TaskerConfig) (*Tasker, error) {
 	if err != nil {
 		return nil, err
 	}
+	userService := services.NewUserService(client)
 	cron := ProvideCron()
 	taskService := services.NewTaskService(client, cron)
 	settingService := services.NewSettingService(client)
 	githubAuthService := services.NewGithubAuthService()
-	router := handlers.NewRouter(taskService, settingService, githubAuthService, client)
+	router := handlers.NewRouter(userService, taskService, settingService, githubAuthService, client)
 	tasker := ProivdeTasker(tc, router, cron)
 	return tasker, nil
 }

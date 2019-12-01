@@ -45,3 +45,17 @@ func (u *UserService) CreateUser(newUser *models.User) (*models.User, error) {
 
 	return newUser, nil
 }
+
+func (u *UserService) FindUser(username string) (*models.User, error) {
+	var user models.User
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	err := u.Collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return &user, nil
+}
