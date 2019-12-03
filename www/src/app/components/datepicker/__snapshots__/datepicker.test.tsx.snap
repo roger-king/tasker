@@ -17,7 +17,7 @@ exports[`<DatePicker /> Matches the snapshot with datepicker closed 1`] = `
     <span
       className="StyledText-sc-1sadyjn-0 fWSbXS"
     >
-      11/30/2019
+      12/1/2019
     </span>
     <div
       className="StyledBox-sc-13pk1d4-0 bspmCs"
@@ -56,7 +56,7 @@ exports[`<DatePicker /> Matches the snapshot with datepicker open 1`] = `
     <span
       className="StyledText-sc-1sadyjn-0 fWSbXS"
     >
-      11/30/2019
+      12/1/2019
     </span>
     <div
       className="StyledBox-sc-13pk1d4-0 bspmCs"
