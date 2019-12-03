@@ -12,7 +12,6 @@ import (
 	"github.com/roger-king/tasker/handlers"
 	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
-	"github.com/roger-king/tasker/utils"
 	"github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
 	"os"
@@ -73,7 +72,6 @@ func ProivdeTasker(tc models.TaskerConfig, r *mux.Router, c *cron.Cron) *Tasker 
 func (t *Tasker) Start() *mux.Router {
 	logrus.Info("Starting Tasker application")
 	t.Scheduler.Start()
-	logrus.Info(utils.TaskerSecret)
 
 	return t.Router
 }
