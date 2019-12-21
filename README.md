@@ -51,10 +51,14 @@ Tasker utilizes [`12 Factor App configs`](https://12factor.net/config). Tasker r
 
 Below are the availble of environment variables that Tasker looks for (note: prefixed with `TASKER_`):
 
-| ENV                      |                        Description                         |
-| ------------------------ | :--------------------------------------------------------: |
-| TASKER_DB_CONNECTION_URL |                    mongo connection uri                    |
-| TASKER_PLUGIN_DIR        | root direction where your compiled go plugins can be found |
+| ENV                      |                 Description                  |
+| ------------------------ | :------------------------------------------: |
+| TASKER_DB_MIGRATE        | true/false flag for auto migrate on start up |
+| TASKER_DB_CONNECTION_URL |           Postgres connection uri            |
+| GITHUB_CLIENT_ID         |     Github Client ID for authentication      |
+| GITHUB_CLIENT_SECRET     |       Github Secret for authentication       |
+
+Connection to the database can be set by either setting `TASKER_DB_CONNECTION_URL` or by setting
 
 ## TODOS:
 

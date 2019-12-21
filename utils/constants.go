@@ -5,23 +5,11 @@ import (
 )
 
 var (
+	// DBMigrate
+	DBMigrate = os.Getenv("TASK_DB_MIGRATE")
+
 	// DBConnectionURL -
 	DBConnectionURL = os.Getenv("TASKER_DB_CONNECTION_URL")
-
-	// DBName -
-	DBName = os.Getenv("TASKER_DB_NAME")
-
-	// DBHost -
-	DBHost = os.Getenv("TASKER_DB_HOST")
-
-	// DBUser -
-	DBUser = os.Getenv("TASKER_DB_USER")
-
-	// DBPassword -
-	DBPassword = os.Getenv("TASKER_DB_PASSWORD")
-
-	// DBPort -
-	DBPort = os.Getenv("TASKER_DB_PORT")
 
 	// ScriptRoot -
 	ScriptRoot = os.Getenv("TASKER_SCRIPT_ROOT")
