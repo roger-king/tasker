@@ -33,7 +33,7 @@ func checkCookie(w http.ResponseWriter, r *http.Request) (int, *models.UserClaim
 	// if the token is invalid (if it has expired according to the expiry time we set on sign in),
 	// or if the signature does not match
 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(utils.TaskerJWTSecret), nil
+		return []byte(utils.TaskerSecret), nil
 	})
 
 	if err != nil {

@@ -25,7 +25,7 @@ func GenerateJWTToken(user *models.User) (string, time.Time, error) {
 		},
 	}
 
-	jwtKey := []byte(utils.TaskerJWTSecret)
+	jwtKey := []byte(utils.TaskerSecret)
 
 	// Declare the token with the algorithm used for signing, and the claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

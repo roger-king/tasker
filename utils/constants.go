@@ -5,8 +5,11 @@ import (
 )
 
 var (
-	// DBType -
-	DBType = os.Getenv("TASKER_DB_TYPE")
+	// DBConnectionURL -
+	DBConnectionURL = os.Getenv("TASKER_DB_CONNECTION_URL")
+
+	// DBName -
+	DBName = os.Getenv("TASKER_DB_NAME")
 
 	// DBHost -
 	DBHost = os.Getenv("TASKER_DB_HOST")
@@ -23,20 +26,17 @@ var (
 	// ScriptRoot -
 	ScriptRoot = os.Getenv("TASKER_SCRIPT_ROOT")
 
-	// TASKER_ENV -
+	// TaskerEnv -
 	TaskerEnv = os.Getenv("TASKER_ENV")
 
-	// GITHUB_CLIENT_ID
+	// GithubClientID
 	GithubClientID = os.Getenv("GITHUB_CLIENT_ID")
 
-	// GITHUB_CLIENT_SECRET
+	// GithubClientSecret
 	GithubClientSecret = os.Getenv("GITHUB_CLIENT_SECRET")
 
 	// TaskerSecret - used for our signing of access tokens
 	TaskerSecret = os.Getenv("TASKER_SECRET")
-
-	// TaskerJWTSecret - used for our signing of jwt tokens
-	TaskerJWTSecret = os.Getenv("TASKER_JWT_SECRET")
 )
 
 // HTTPError -
