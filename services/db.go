@@ -13,7 +13,7 @@ import (
 )
 
 // NewMongoConnection - creates a MongoConnection instance
-func NewMongoConnection(tc models.TaskerConfig) (*mongo.Client, error) {
+func NewMongoConnection(tc *models.TaskerConfig) (*mongo.Client, error) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(string(tc.MongoConnectionURL)))

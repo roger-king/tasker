@@ -5,14 +5,10 @@ import (
 	"net/http"
 
 	"github.com/roger-king/tasker"
-	tm "github.com/roger-king/tasker/models"
 )
 
 func main() {
-	t, err := tasker.New(tm.TaskerConfig{
-		Type:               "mongo",
-		MongoConnectionURL: tm.MongoConnectionURL("mongodb://appuser:appuser@localhost:27017/tasker?authSource=admin"),
-	})
+	t, err := tasker.New()
 
 	if err != nil {
 		log.Panic(err)

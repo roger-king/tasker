@@ -17,14 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-// Tasker -
-type Tasker struct {
-	Config    models.TaskerConfig
-	DB        *mongo.Client
-	Scheduler *cron.Cron
-	Router    *mux.Router
-}
-
 func init() {
 	// Log as JSON instead of the default ASCII formatter.
 	log.SetFormatter(&log.JSONFormatter{})
@@ -37,13 +29,25 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 }
 
-var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProvideCron, ProivdeTasker)
+// Tasker -
+type Tasker struct {
+	Config    *models.TaskerConfig
+	DB        *mongo.Client
+	Scheduler *cron.Cron
+	Router    *mux.Router
+}
+
+var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProvideCron, ProvideConfig, ProivdeTasker)
 
 func ProvideCron() *cron.Cron {
 	return cron.New()
 }
 
-func ProivdeTasker(tc models.TaskerConfig, r *mux.Router, c *cron.Cron) *Tasker {
+func ProvideConfig() *models.TaskerConfig {
+	return &models.TaskerConfig{}
+}
+
+func ProivdeTasker(tc *models.TaskerConfig, r *mux.Router, c *cron.Cron) *Tasker {
 	return &Tasker{
 		Config:    tc,
 		Scheduler: c,
@@ -52,7 +56,7 @@ func ProivdeTasker(tc models.TaskerConfig, r *mux.Router, c *cron.Cron) *Tasker 
 }
 
 // New - Creates a new instance of tasker
-func New(tc models.TaskerConfig) (*Tasker, error) {
+func New() (*Tasker, error) {
 	wire.Build(TaskerSet)
 	return nil, nil
 }

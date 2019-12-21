@@ -1,22 +1,18 @@
 version: "3.1"
 
-services:
-  mongo:
-    image: mongo
-    restart: always
-    ports:
-      - 27017:27017
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: appuser
-      MONGO_INITDB_ROOT_PASSWORD: appuser
-      MONGO_INITDB_DATABASE: tasker
+volumes:
+  db: {}
 
-  mongo-express:
-    image: mongo-express
+services:
+  tasker_db:
+    image: postgres:11.6
     restart: always
-    ports:
-      - 8081:8081
+    container_name: tasker_example_db
     environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: appuser
-      ME_CONFIG_MONGODB_ADMINPASSWORD: appuser
-    
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: appuser
+      POSTGRES_DB: tasker
+    volumes:
+      - db:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
