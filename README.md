@@ -35,10 +35,18 @@ Tasker is simple to get started. Tasker has 2 goals at mind:
 - Create your own handler functions to programmatically run code
 
 ```golang
-    t := tasker.New()
+	t, err := tasker.New(&config.TaskerConfig{
+		Migrate: false,
+		Auth:    true,
+		DBConnectionURL: "postgres://appuser:appuser@localhost:5432/tasker",
+	})
+
+	if err != nil {
+		log.Panic(err)
+	}
+
 	router := t.Start()
 
-    // Add to your HTTP Server
 	http.Handle("/", router)
 	http.ListenAndServe(":8080", nil)
 ```
@@ -47,18 +55,14 @@ Go to your server and find the tasker web client at `/tasker/admin`.
 
 ## Configuration of your server
 
-Tasker utilizes [`12 Factor App configs`](https://12factor.net/config). Tasker relies environment variables to handle configruation of the application
-
-Below are the availble of environment variables that Tasker looks for (note: prefixed with `TASKER_`):
+Tasker provides a `TaskerConfig` that helps configure your server. I recommend you set those values with a secret manager or using [`12 Factor App configs`](https://12factor.net/config).
 
 | ENV                      |                 Description                  |
 | ------------------------ | :------------------------------------------: |
-| TASKER_DB_MIGRATE        | true/false flag for auto migrate on start up |
+| Migrate                  | true/false flag for auto migrate on start up |
 | TASKER_DB_CONNECTION_URL |           Postgres connection uri            |
 | GITHUB_CLIENT_ID         |     Github Client ID for authentication      |
 | GITHUB_CLIENT_SECRET     |       Github Secret for authentication       |
-
-Connection to the database can be set by either setting `TASKER_DB_CONNECTION_URL` or by setting
 
 ## TODOS:
 
