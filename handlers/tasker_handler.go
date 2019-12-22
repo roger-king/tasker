@@ -1,12 +1,10 @@
 package handlers
 
 import (
-	"encoding/json"
 	"errors"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
 )
@@ -27,44 +25,44 @@ func ListTasks(t *services.TaskService) http.HandlerFunc {
 }
 
 // CreateTask -
-func CreateTask(t *services.TaskService, u *services.UserService) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		var input models.NewInputTask
-		decoder := json.NewDecoder(r.Body)
+// func CreateTask(t *services.TaskService, u *services.UserService) http.HandlerFunc {
+// 	return func(w http.ResponseWriter, r *http.Request) {
+// 		var input models.NewInputTask
+// 		decoder := json.NewDecoder(r.Body)
 
-		if err := decoder.Decode(&input); err != nil {
-			respondWithError(w, http.StatusInternalServerError, utils.RequestError, err.Error())
-			return
-		}
+// 		if err := decoder.Decode(&input); err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, utils.RequestError, err.Error())
+// 			return
+// 		}
 
-		currUser := r.Context().Value(ContextKey("user")).(models.User)
-		foundUser, err := u.FindUser(currUser.UserName)
+// 		currUser := r.Context().Value(ContextKey("user")).(models.User)
+// 		foundUser, err := u.FindUser(currUser.UserName)
 
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "", err)
-			return
-		}
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, "", err)
+// 			return
+// 		}
 
-		token, err := foundUser.GetAccessToken()
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, "", err)
-			return
-		}
+// 		token, err := foundUser.GetAccessToken()
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, "", err)
+// 			return
+// 		}
 
-		gAPI := services.NewGithubAPIService(token)
-		gAPI.DownloadTaggedAssets()
+// 		gAPI := services.NewGithubAPIService(token)
+// 		gAPI.DownloadTaggedAssets()
 
-		tasks, err := t.Create(&input)
+// 		tasks, err := t.Create(&input)
 
-		if err != nil {
-			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
-			return
-		}
+// 		if err != nil {
+// 			respondWithError(w, http.StatusInternalServerError, utils.ProcessingError, err.Error())
+// 			return
+// 		}
 
-		respondWithJSON(w, http.StatusOK, tasks)
-		return
-	}
-}
+// 		respondWithJSON(w, http.StatusOK, tasks)
+// 		return
+// 	}
+// }
 
 // FindOneTask -
 func FindTask(t *services.TaskService) http.HandlerFunc {

@@ -3,4 +3,6 @@ package services
 import "github.com/google/wire"
 
 // var ServiceSet = wire.NewSet(NewGithubAuthService, NewUserService, NewSettingService, NewTaskService, NewMongoService, NewMongoConnection)
-var ServiceSet = wire.NewSet(NewGithubAuthService, NewDBConnection)
+
+// ServiceSet -
+var ServiceSet = wire.NewSet(NewGithubAuthService, NewUserService, NewDBConnection)

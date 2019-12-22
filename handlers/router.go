@@ -8,30 +8,31 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
+// RouterSet -
 var RouterSet = wire.NewSet(NewRouter)
 
-func NewRouter(userService *services.UserService, taskService *services.TaskService, settingService *services.SettingService, gh *services.GithubAuthService, db *mongo.Client) *mux.Router {
+// NewRouter - sets up the tasker routes
+func NewRouter(userService *services.UserService, gh *services.GithubAuthService) *mux.Router {
 	r := mux.NewRouter()
 
 	r.HandleFunc("/check", CheckSession()).Methods("GET")
 
 	apiRouter := r.PathPrefix("/tasker").Subrouter()
 	apiRouter.Use(authMiddleware)
-	apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
-	apiRouter.HandleFunc("/tasks", CreateTask(taskService, userService)).Methods("POST")
+	// apiRouter.HandleFunc("/tasks", ListTasks(taskService)).Methods("GET")
+	// apiRouter.HandleFunc("/tasks", CreateTask(taskService, userService)).Methods("POST")
 
-	// Single Task Routes
-	apiRouter.HandleFunc("/tasks/{taskID}", FindTask(taskService)).Methods("GET")
-	apiRouter.HandleFunc("/tasks/{taskID}/disable", DisableTask(taskService)).Methods("PATCH")
-	apiRouter.HandleFunc("/tasks/{taskID}", DeleteTask(taskService)).Methods("DELETE")
+	// // Single Task Routes
+	// apiRouter.HandleFunc("/tasks/{taskID}", FindTask(taskService)).Methods("GET")
+	// apiRouter.HandleFunc("/tasks/{taskID}/disable", DisableTask(taskService)).Methods("PATCH")
+	// apiRouter.HandleFunc("/tasks/{taskID}", DeleteTask(taskService)).Methods("DELETE")
 
-	// Setting Routes
-	apiRouter.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
-	apiRouter.HandleFunc("/settings/plugin", CreatePluginSetting(settingService)).Methods("POST")
-	apiRouter.HandleFunc("/settings/plugin/toggle", ToggleActiveRepository(settingService)).Methods("PATCH")
+	// // Setting Routes
+	// apiRouter.HandleFunc("/settings/plugin", ListPluginSetting(settingService)).Methods("GET")
+	// apiRouter.HandleFunc("/settings/plugin", CreatePluginSetting(settingService)).Methods("POST")
+	// apiRouter.HandleFunc("/settings/plugin/toggle", ToggleActiveRepository(settingService)).Methods("PATCH")
 
 	// User Route
 	apiRouter.HandleFunc("/me", GetCurrentUser()).Methods("GET")
@@ -44,7 +45,7 @@ func NewRouter(userService *services.UserService, taskService *services.TaskServ
 	// authenticate route
 	// Public routes for github access
 	oauth := r.PathPrefix("/oauth").Subrouter()
-	oauth.HandleFunc("/authenticate/{code}", LoginHandler(gh, db)).Methods("POST")
+	oauth.HandleFunc("/authenticate/{code}", LoginHandler(gh, userService)).Methods("POST")
 	oauth.HandleFunc("/github/user", FetchUserClientIDHandler(gh)).Methods("GET")
 
 	return r

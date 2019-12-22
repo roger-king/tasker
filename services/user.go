@@ -1,61 +1,60 @@
 package services
 
 import (
-	"context"
-	"time"
-
+	sq "github.com/Masterminds/squirrel"
+	"github.com/jmoiron/sqlx"
 	"github.com/roger-king/tasker/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
+	log "github.com/sirupsen/logrus"
 )
 
-// MongoService - a service to interact with a task
+// UserService -
 type UserService struct {
-	Collection *mongo.Collection
+	DB        *sqlx.DB
+	TableName string
 }
 
-// NewUserService - initializes task service
-func NewUserService(db *mongo.Client) *UserService {
-	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
-	defer cancel()
-	collection := db.Database("tasker").Collection("users")
-	collection.Indexes().CreateOne(ctx, mongo.IndexModel{Keys: bson.M{
-		"username": 1,
-	}, Options: options.Index().SetUnique(true)})
-
+// NewUserService - initializes user service
+func NewUserService(db *sqlx.DB) *UserService {
 	return &UserService{
-		Collection: collection,
+		DB:        db,
+		TableName: "users",
 	}
 }
 
-func (u *UserService) CreateUser(newUser *models.User) (*models.User, error) {
-	newUser.BeforeCreate()
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	result := u.Collection.FindOneAndReplace(ctx, bson.M{"username": newUser.UserName}, newUser)
-	if result.Err() != nil {
-		_, err := u.Collection.InsertOne(ctx, newUser)
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return newUser, nil
-}
-
-func (u *UserService) FindUser(username string) (*models.User, error) {
-	var user models.User
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	err := u.Collection.FindOne(ctx, bson.M{"username": username}).Decode(&user)
+// CreateUser - creates a user
+func (u *UserService) CreateUser(input *models.NewUserInput) (*models.UserDTO, error) {
+	err := input.BeforeCreate()
 
 	if err != nil {
+		log.Error("Error encrypting token")
 		return nil, err
 	}
 
-	return &user, nil
+	sql, _, err := sq.Insert(u.TableName).Columns("email", "name", "username", "bio", "github_url", "access_token").Values(`:email, :name, :username, :bio, :github_url`).ToSql()
+
+	if err != nil {
+		log.Error("Failed to create insert query")
+		return nil, err
+	}
+
+	_, err = u.DB.NamedExec(sql, map[string]interface{}{
+		"email":      input.Email,
+		"name":       input.Name,
+		"username":   input.UserName,
+		"bio":        input.Bio,
+		"github_url": input.GitHubURL,
+	})
+
+	if err != nil {
+		log.Error("Failed to insert:", err)
+		return nil, err
+	}
+
+	return &models.UserDTO{
+		Email:     input.Email,
+		Name:      input.Name,
+		Bio:       input.Bio,
+		GitHubURL: input.GitHubURL,
+		UserName:  input.UserName,
+	}, nil
 }

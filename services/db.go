@@ -3,16 +3,18 @@ package services
 import (
 	"fmt"
 	"github.com/golang-migrate/migrate/v4"
+	// blank import for migrate
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+
 	"github.com/jmoiron/sqlx"
+	// blank import for sqlx
 	_ "github.com/lib/pq"
 	"github.com/roger-king/tasker/config"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/src-d/go-billy.v4/memfs"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/storage/memory"
-	"os"
 )
 
 // NewDBConnection -
@@ -45,19 +47,18 @@ func NewDBConnection(tc *config.TaskerConfig) *sqlx.DB {
 
 						if err != nil {
 							log.Fatal("Failed to initialize connection:", err)
-							os.Exit(1)
 						}
 
 						err = m.Up()
 
 						if err != nil {
 							log.Errorf("Failed to run migration:", err.Error())
-							os.Exit(1)
 						}
 					}
 				}
 			}
 		}
 	}
+
 	return db
 }

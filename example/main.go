@@ -15,6 +15,7 @@ func main() {
 		DBConnectionURL:    "postgres://appuser:appuser@localhost:5432/tasker?sslmode=disable",
 		GithubClientID:     "",
 		GithubClientSecret: "",
+		Secret:             "the-key-has-to-be-32-bytes-long!",
 	})
 
 	if err != nil {

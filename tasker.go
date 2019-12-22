@@ -13,6 +13,7 @@ import (
 	_ "github.com/joho/godotenv/autoload"
 	cron "github.com/robfig/cron/v3"
 	"github.com/roger-king/tasker/config"
+	"github.com/roger-king/tasker/handlers"
 	"github.com/roger-king/tasker/services"
 	log "github.com/sirupsen/logrus"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -38,13 +39,17 @@ type Tasker struct {
 	Router    *mux.Router
 }
 
-var TaskerSet = wire.NewSet(services.ServiceSet, ProvideCron, ProivdeTasker)
+var TaskerSet = wire.NewSet(services.ServiceSet, handlers.RouterSet, ProvideCron, ProivdeTasker)
 
 func ProvideCron() *cron.Cron {
 	return cron.New()
 }
 
-func ProivdeTasker(tc *config.TaskerConfig, c *cron.Cron, db *sqlx.DB) *Tasker {
+func ProivdeTasker(tc *config.TaskerConfig, r *mux.Router, c *cron.Cron, db *sqlx.DB) *Tasker {
+	if len(tc.Secret) > 32 {
+		
+	}
+
 	if tc.Auth {
 		if len(tc.GithubClientID) == 0 && len(tc.GithubClientSecret) == 0 {
 			log.Fatal("Authentication is enabled. Please provide the github client id and secret.")
@@ -65,6 +70,7 @@ func ProivdeTasker(tc *config.TaskerConfig, c *cron.Cron, db *sqlx.DB) *Tasker {
 	return &Tasker{
 		Config:    tc,
 		Scheduler: c,
+		Router:    r,
 	}
 }
 

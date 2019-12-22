@@ -8,7 +8,8 @@ import (
 	"github.com/roger-king/tasker/utils"
 )
 
-func GenerateJWTToken(user *models.User) (string, time.Time, error) {
+// GenerateJWTToken -
+func GenerateJWTToken(user *models.UserDTO) (string, time.Time, error) {
 	expirationTime := time.Now().Add(120 * time.Minute)
 	// Create the JWT claims, which includes the username and expiry time
 	claims := &models.UserClaims{

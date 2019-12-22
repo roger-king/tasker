@@ -11,17 +11,40 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-type User struct {
-	Email                string `json:"email" bson:"email"`
-	Name                 string `json:"name" bson:"name"`
-	UserName             string `json:"username" bson:"username"`
-	EncryptedAccessToken string `json:"-" bson:"accessToken"`
-	AccessToken          string `json:"-" bson:"-"`
-	Bio                  string `json:"bio" bson:"bio"`
-	GitHubURL            string `json:"githubURL" bson:"githubURL"`
+// UserDTO -
+type UserDTO struct {
+	Email     string `json:"email"`
+	Name      string `json:"name"`
+	UserName  string `json:"username"`
+	Bio       string `json:"bio"`
+	GitHubURL string `json:"githubURL"`
 }
 
-func (u *User) BeforeCreate() error {
+// NewUserInput -
+type NewUserInput struct {
+	Email                string `json:"email"`
+	Name                 string `json:"name"`
+	UserName             string `json:"username"`
+	Bio                  string `json:"bio"`
+	GitHubURL            string `json:"githubURL"`
+	AccessToken          string `json:"accessToken"`
+	EncryptedAccessToken string `json:"-"`
+}
+
+// User -
+type User struct {
+	ID                   int    `db:"id"`
+	Email                string `db:"email"`
+	Name                 string `db:"name"`
+	UserName             string `db:"username"`
+	EncryptedAccessToken string `db:"access_token"`
+	AccessToken          string `db:"-"`
+	Bio                  string `db:"bio"`
+	GitHubURL            string `db:"githubURL"`
+}
+
+// BeforeCreate -
+func (u *NewUserInput) BeforeCreate() error {
 	bKey := []byte(u.AccessToken)
 
 	encryptedToken, err := encrypt(bKey, []byte(utils.TaskerSecret))
@@ -35,6 +58,7 @@ func (u *User) BeforeCreate() error {
 	return nil
 }
 
+// GetAccessToken -
 func (u *User) GetAccessToken() (string, error) {
 	secret := utils.TaskerSecret
 

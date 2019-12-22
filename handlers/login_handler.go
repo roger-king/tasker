@@ -8,10 +8,10 @@ import (
 	"github.com/roger-king/tasker/models"
 	"github.com/roger-king/tasker/services"
 	"github.com/roger-king/tasker/utils"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func LoginHandler(gh *services.GithubAuthService, db *mongo.Client) http.HandlerFunc {
+// LoginHandler -
+func LoginHandler(gh *services.GithubAuthService, us *services.UserService) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		code := vars["code"]
@@ -42,8 +42,7 @@ func LoginHandler(gh *services.GithubAuthService, db *mongo.Client) http.Handler
 			return
 		}
 
-		userService := services.NewUserService(db)
-		createdUser, err := userService.CreateUser(&models.User{
+		createdUser, err := us.CreateUser(&models.NewUserInput{
 			Email:       user.GetEmail(),
 			UserName:    user.GetLogin(),
 			Name:        user.GetName(),
