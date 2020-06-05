@@ -7,15 +7,9 @@
 
 # Tasker - [ DEVELOPMENT IN PROGRESS ]
 
-Tasker is ~~a job scheduling service that utilizes `go-cron`. Tasker is a service that will allow for dynamic configration of tasks.~~ a Kubernetes management tool for cronjobs.
+Tasker is a job scheduling service that utilizes `go-cron`. Tasker is a service that will allow for dynamic configration of tasks.
 
 Tasker is inspired by the Android application `tasker` the ability to set scripts and schedule them at whim without needing to touch the server code.
-
-## WIP
-
-Updates coming soon to re-work the APIs.
-
----
 
 <img src="./static/wip_ui_v1.0.3.png" width="800px" align="center">
 
